@@ -20,19 +20,30 @@ In the context of automatic differentiation, the overall speedup of the system i
 
 #### GOALS AND DELIVERABLES: 
 ##### PLAN TO ACHIEVE:
-CPU version and CUDA version implementations of the following operations:
-- Addition
-- Multiplication
-- Transpose
-- Power
-- Matrix Multiplication 
-- Broadcast/reverse broadcast
-Detailed analysis of the performance characteristics of both the implementations across different input matrix sizes.
-Implementation of a library in Python that uses the CPU and GPU versions of operations defined in the previous point to perform automatic differentiation. (This is a low-priority part, and in case the work goes more slowly we will not do this)
+<ul>
+
+<li> CPU version and CUDA version implementations of the following operations:</li>
+<ul>
+  <li>Addition</li>
+  <li>Multiplication</li>
+  <li>Transpose</li>
+  <li>Power</li>
+  <li>Broadcast/reverse broadcast</li>
+  <li>Matrix Multiplication</li>
+</ul>
+
+  <li>Detailed analysis of the performance characteristics of both the implementations across different input matrix sizes.</li>
+
+  <li>Implementation of a library in Python that uses the CPU and GPU versions of operations defined in the previous point to perform automatic differentiation. (This is a low-priority part, and in case the work goes more slowly we will not do this)</li>
+</ul>
+
 
 ##### HOPE TO ACHIEVE:
-CPU version and CUDA version implementations to support 2D convolutions
-Detailed analysis of the performance characteristics of both the implementations across different architectures (different GPUs, memory per CPU etc).
+<ul>
+ <li>CPU version and CUDA version implementations to support 2D convolutions</li>
+
+ <li>Detailed analysis of the performance characteristics of both the implementations across different architectures (different GPUs, memory per CPU etc).</li>
+</ul>
 
 #### FINAL DELIVERABLE AT POSTER SESSION:
 We plan to have an interactive demo of our Python library that demonstrates how our code runs for some small demo matrix operations. We will also present detailed visualisations of our benchmarking experiments and hope to show a much better improvement in runtime in CUDA over the CPU-based implementation. We hope to see upto 20x speedup over the CPU-based implementation. 
