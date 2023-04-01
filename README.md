@@ -41,4 +41,6 @@ We plan to have an interactive demo of our Python library that demonstrates how 
 The platform we hope to use for deployment and benchmarking is the GHC machines. We plan to use the GHC machines for development, testing and benchmarking as they provide a convenient development environment and have reasonably powerful GPUs. 
 We choose C++ as our language for tensor operations so that we can leverage CUDA C++. C++ allows for a lower level of memory management and thus will allow for application of more sophisticated parallelization paradigms. We choose Python to implement our frontend and library as it will be quick to implement and we can focus more effort on the development of parallel code.
 
+#### SCHEDULE:
+![Schedule](https://raw.githubusercontent.com/jay1999ke/15618.cuda-autodiff/main/imgs/Milestones.png)
 
