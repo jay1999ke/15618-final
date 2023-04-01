@@ -18,7 +18,15 @@ The automatic differentiation library will be written in python – so that we c
 #### THE CHALLENGE: 
 In the context of automatic differentiation, the overall speedup of the system is of interest rather than the speedup achieved for individual operations. While speeding up a single operation can be relatively straightforward – implementing a kernel, managing memory becomes complicated when dealing with multiple operations that produce tensors required for backpropagation. To reduce memory copy overhead, tensors must be kept in local memory until backpropagation is complete. Additionally, since tensor sizes are not fixed, a mechanism must be developed to automatically determine block size and thread count for each kernel operation along with data locality – especially for the matrix multiplication operations. Therefore, to fully optimize the system, we need to consider the interdependence of operations, memory management, and runtime optimization of the kernel operations.
 
+#### RESOURCES: 
+<ul>
+
+<li>We will be starting from scratch.</li>
+ <li>For the automatic differentiation implementation, Dougal Maclaurin thesis’s (Chapter 4 describes Autograd) as a reference.</li>
+</ul>
+
 #### GOALS AND DELIVERABLES: 
+
 ##### PLAN TO ACHIEVE:
 <ul>
 
