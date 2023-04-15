@@ -1,0 +1,3 @@
+[submodule "autodiff/pybind11"]
+	path = autodiff/pybind11
+	url = https://github.com/pybind/pybind11
