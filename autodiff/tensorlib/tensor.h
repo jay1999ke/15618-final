@@ -36,6 +36,7 @@ class Tensor {
     void gpu();
     void cpu();
     void gpuFree();
+    bool onCPU(){return !on_gpu;};
     std::string repr();
     py::buffer_info request() {
         return py::buffer_info(

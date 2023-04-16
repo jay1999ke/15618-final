@@ -16,6 +16,7 @@ PYBIND11_MODULE(tensorlib, m) {
         .def("__repr__", &Tensor::repr)
         .def("cpu", &Tensor::cpu)
         .def("gpu", &Tensor::gpu)
+        .def("onCPU", &Tensor::onCPU)
         .def("gpuFree", &Tensor::gpuFree);
 
     m.def("cpu_add", [](Tensor a, Tensor b) { return cpu_add(a, b); },

@@ -5,3 +5,5 @@
 *.cubin
 *.fatbin
 .vscode/
+__pycache__/
+*/__pycache__/

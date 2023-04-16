@@ -1,0 +1,3 @@
+
+class AutoDiffException(Exception):
+    pass

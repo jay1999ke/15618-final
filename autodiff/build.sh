@@ -7,3 +7,5 @@ cmake .. \
 make
 export PYTHONPATH=$PWD:$PYTHONPATH
 cd ..
+stubgen -p tensorlib -o tensorlib/ -p tensorlib.so
+mv tensorlib/tensorlib.pyi tensorlib/__init__.pyi

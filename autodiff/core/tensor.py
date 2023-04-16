@@ -1,15 +1,28 @@
-import blas
 import numpy as np
+import autodiff.tensorlib as tensorlib
+from autodiff.core import exceptions
 
-arr2 = np.linspace(1.0,9,9).astype(np.float32).reshape(3,3)
-arr1 = np.linspace(1.0,9,9).astype(np.float32).reshape(3,3)
 
-print("1  ", arr1)
-print("2  ", arr2)
-print("cpu", blas.cpu_add(arr1, arr2))
-print("gpu", blas.gpu_add(arr1, arr2))
+def make_numpy(obj: any) -> np.ndarray:
+    t_type = type(obj)
+    if t_type == int or t_type == float or t_type == bool:
+        obj = np.array([[obj]])
+    elif isinstance(obj, np.ndarray):
+        pass
+    else:
+        obj = np.array(obj)
+    if len(obj.shape) == 2:
+        raise exceptions.AutoDiffException("Invalid object")
+    return obj
+
 
 class Tensor(object):
 
-    def __init__(self) -> None:
-        self.value: np.ndarray = None
+    def __init__(self, object, requires_grad = False) -> None:
+        object = make_numpy(object)
+        self.value: tensorlib.Tensor = tensorlib.Tensor(object)
+        self.grad: tensorlib.Tensor = None
+        self.requires_grad = requires_grad
+
+    def onCPU(self) -> bool:
+        return self.value.onCPU()
