@@ -6,6 +6,7 @@ cmake .. \
 -DPYTHON_LIBRARY=$(python -c "import sysconfig; print(sysconfig.get_config_var('LIBDIR'))")
 make
 export PYTHONPATH=$PWD:$PYTHONPATH
+pybind11-stubgen tensorlib -o . --no-setup-py
+mv tensorlib-stubs/__init__.pyi ../tensorlib/__init__.pyi
+rm tensorlib-stubs -rf
 cd ..
-stubgen -p tensorlib -o tensorlib/ -p tensorlib.so
-mv tensorlib/tensorlib.pyi tensorlib/__init__.pyi

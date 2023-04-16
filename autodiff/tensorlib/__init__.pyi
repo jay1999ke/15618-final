@@ -1,11 +1,22 @@
-from typing import overload
+from __future__ import annotations
+import tensorlib
+import typing
 import numpy
+_Shape = typing.Tuple[int, ...]
 
-class Tensor:
-    @overload
+__all__ = [
+    "Tensor",
+    "cpu_add",
+    "gpu_add"
+]
+
+
+class Tensor():
+    @typing.overload
     def __init__(self, arg0: int, arg1: int) -> None: ...
-    @overload
+    @typing.overload
     def __init__(self, arg0: numpy.ndarray[numpy.float32]) -> None: ...
+    def __repr__(self) -> str: ...
     def cols(self) -> int: ...
     def cpu(self) -> None: ...
     def data(self) -> float: ...
@@ -13,6 +24,8 @@ class Tensor:
     def gpuFree(self) -> None: ...
     def onCPU(self) -> bool: ...
     def rows(self) -> int: ...
-
-def cpu_add(arg0: Tensor, arg1: Tensor) -> Tensor: ...
-def gpu_add(arg0: Tensor, arg1: Tensor) -> Tensor: ...
+    pass
+def cpu_add(arg0: Tensor, arg1: Tensor) -> Tensor:
+    pass
+def gpu_add(arg0: Tensor, arg1: Tensor) -> Tensor:
+    pass
