@@ -20,13 +20,14 @@ void Tensor::gpu() {
 }
 
 void Tensor::cpu() {
-    assert(gpu_data != nullptr);
-    cudaMemcpy(data(), dataGpu(), size(), cudaMemcpyDeviceToHost);
+    if (dataGpu() != nullptr)
+        cudaMemcpy(data(), dataGpu(), size(), cudaMemcpyDeviceToHost);
 }
 
 void Tensor::gpuFree() {
     if (dataGpu() != nullptr)
         cudaFree(dataGpu());
+    gpu_data = nullptr;
     setOnGpu(false);
 }
 

@@ -27,7 +27,7 @@ std::string Tensor::repr() {
 
 Tensor cpu_add(Tensor a, Tensor b) {
     a.onCpuAssert();
-    b.onGpuAssert();
+    b.onCpuAssert();
 
     py::buffer_info a_info = a.request();
     py::buffer_info b_info = b.request();

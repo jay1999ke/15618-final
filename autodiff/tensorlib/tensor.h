@@ -1,5 +1,4 @@
 #include <cuda_runtime.h>
-#include <cuda_runtime.h>
 #include <iomanip>
 #include <iostream>
 #include <pybind11/numpy.h>
@@ -17,14 +16,18 @@ class Tensor {
         gpu_data = nullptr;
     }
 
+    // creating an object from numpy array (expected to be on cpu)
     Tensor(py::array_t<float> numpy) {
         py::buffer_info info = numpy.request();
-        cpu_data = static_cast<float *>(info.ptr);
+        auto orig_data = info.ptr;
         assert(info.shape.size() == 2);
         dim0 = info.shape[0];
         dim1 = info.shape[1];
         on_gpu = false;
         gpu_data = nullptr;
+
+        cpu_data = new float[rows() * cols()];
+        memcpy(cpu_data, orig_data, size());
     }
 
     // buffer ops
