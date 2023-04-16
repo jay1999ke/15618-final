@@ -30,6 +30,12 @@ class Tensor {
         memcpy(cpu_data, orig_data, size());
     }
 
+    ~Tensor() {
+        delete[] cpu_data;
+        if (on_gpu)
+            gpuFree();
+    };
+
     // buffer ops
     float *data() { return cpu_data; }
     size_t rows() const { return dim0; }
@@ -39,7 +45,7 @@ class Tensor {
     void gpu();
     void cpu();
     void gpuFree();
-    bool onCPU(){return !on_gpu;};
+    bool onCPU() { return !on_gpu; };
     std::string repr();
     py::buffer_info request() {
         return py::buffer_info(
@@ -63,13 +69,13 @@ class Tensor {
 };
 
 // gpu helpers
-Tensor createGPUTensor(size_t rows, size_t cols);
+Tensor *createGPUTensor(size_t rows, size_t cols);
 
 // cpu arith ops
-Tensor cpu_add(Tensor a, Tensor b);
+Tensor *cpu_add(Tensor *a, Tensor *b);
 
 // gpu arith ops
-Tensor gpu_add(Tensor a, Tensor b);
+Tensor *gpu_add(Tensor *a, Tensor *b);
 
 // kernels
 __global__ void _add(float *a, float *b, float *res, int dim0, int dim1);

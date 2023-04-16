@@ -26,7 +26,7 @@ class Tensor(object):
         if isinstance(object, np.ndarray):
             self.value: tensorlib.Tensor = tensorlib.Tensor(object)
         else:
-            self.value
+            self.value: tensorlib.Tensor = object
         self.grad: Tensor = None
         self.requires_grad = requires_grad
 
@@ -62,7 +62,8 @@ class BinaryOp(Tensor):
         bOnCPU = b.onCPU()
         assert aOnCPU == bOnCPU, "Tensors are not on the same device"
         if aOnCPU:
-            self.value = CPU[op](a.value, b.value)
+            value = CPU[op](a.value, b.value)
         else:
-            self.value = GPU[op](a.value, b.value)
+            value = GPU[op](a.value, b.value)
+        super().__init__(value)
         self.requires_grad = a.requires_grad or b.requires_grad

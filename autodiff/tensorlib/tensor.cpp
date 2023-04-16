@@ -25,12 +25,12 @@ std::string Tensor::repr() {
     return str;
 };
 
-Tensor cpu_add(Tensor a, Tensor b) {
-    a.onCpuAssert();
-    b.onCpuAssert();
+Tensor* cpu_add(Tensor *a, Tensor *b) {
+    a->onCpuAssert();
+    b->onCpuAssert();
 
-    py::buffer_info a_info = a.request();
-    py::buffer_info b_info = b.request();
+    py::buffer_info a_info = a->request();
+    py::buffer_info b_info = b->request();
 
     if (a_info.shape.size() != b_info.shape.size()) {
         throw std::runtime_error("Dimentions don't match");
@@ -55,5 +55,5 @@ Tensor cpu_add(Tensor a, Tensor b) {
         }
     }
 
-    return *result;
+    return result;
 }

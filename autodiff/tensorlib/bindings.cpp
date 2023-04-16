@@ -19,8 +19,8 @@ PYBIND11_MODULE(tensorlib, m) {
         .def("onCPU", &Tensor::onCPU)
         .def("gpuFree", &Tensor::gpuFree);
 
-    m.def("cpu_add", [](Tensor a, Tensor b) { return cpu_add(a, b); },
+    m.def("cpu_add", [](Tensor *a, Tensor *b) { return cpu_add(a, b); },
           py::return_value_policy::take_ownership);
-    m.def("gpu_add", [](Tensor a, Tensor b) { return gpu_add(a, b); },
+    m.def("gpu_add", [](Tensor *a, Tensor *b) { return gpu_add(a, b); },
           py::return_value_policy::take_ownership);
 }
