@@ -1,7 +1,7 @@
 #include "tensor.h"
 
 std::string Tensor::repr() {
-    if(on_gpu)
+    if (on_gpu)
         cpu();
     std::string str = "tensor([";
     for (int i = 0; i < dim0; i++) {
@@ -25,7 +25,7 @@ std::string Tensor::repr() {
     return str;
 };
 
-Tensor* cpu_add(Tensor *a, Tensor *b) {
+Tensor *cpu_add(Tensor *a, Tensor *b) {
     a->onCpuAssert();
     b->onCpuAssert();
 
@@ -43,14 +43,14 @@ Tensor* cpu_add(Tensor *a, Tensor *b) {
     auto a_ptr = static_cast<float *>(a_info.ptr);
     auto b_ptr = static_cast<float *>(b_info.ptr);
 
-    int dim1 = a_info.shape[0];
-    int dim2 = a_info.shape[1];
+    int dim0 = a_info.shape[0];
+    int dim1 = a_info.shape[1];
 
-    Tensor *result = new Tensor(dim1, dim2); // create an object on the heap
+    Tensor *result = new Tensor(dim0, dim1); // create an object on the heap
     float *res_ptr = result->data();
 
-    for (int i = 0; i < dim1; i++) {
-        for (int j = 0; j < dim2; j++) {
+    for (int i = 0; i < dim0; i++) {
+        for (int j = 0; j < dim1; j++) {
             res_ptr[i * dim1 + j] = a_ptr[i * dim1 + j] + b_ptr[i * dim1 + j];
         }
     }
@@ -58,7 +58,7 @@ Tensor* cpu_add(Tensor *a, Tensor *b) {
     return result;
 }
 
-Tensor* cpu_mul(Tensor *a, Tensor *b) {
+Tensor *cpu_mul(Tensor *a, Tensor *b) {
     a->onCpuAssert();
     b->onCpuAssert();
 
@@ -76,15 +76,61 @@ Tensor* cpu_mul(Tensor *a, Tensor *b) {
     auto a_ptr = static_cast<float *>(a_info.ptr);
     auto b_ptr = static_cast<float *>(b_info.ptr);
 
-    int dim1 = a_info.shape[0];
-    int dim2 = a_info.shape[1];
+    int dim0 = a_info.shape[0];
+    int dim1 = a_info.shape[1];
 
-    Tensor *result = new Tensor(dim1, dim2); // create an object on the heap
+    Tensor *result = new Tensor(dim0, dim1); // create an object on the heap
     float *res_ptr = result->data();
 
-    for (int i = 0; i < dim1; i++) {
-        for (int j = 0; j < dim2; j++) {
+    for (int i = 0; i < dim0; i++) {
+        for (int j = 0; j < dim1; j++) {
             res_ptr[i * dim1 + j] = a_ptr[i * dim1 + j] * b_ptr[i * dim1 + j];
+        }
+    }
+
+    return result;
+}
+
+Tensor *cpu_sum(Tensor *a, int axis) {
+    a->onCpuAssert();
+
+    py::buffer_info a_info = a->request();
+
+    if (a_info.shape.size() != 2) {
+        throw std::runtime_error("Only 2D tensors supported");
+    }
+
+    auto a_ptr = static_cast<float *>(a_info.ptr);
+
+    int dim0 = a_info.shape[0];
+    int dim1 = a_info.shape[1];
+
+    int res_dim0, res_dim1;
+
+    if (axis == 0) {
+        res_dim0 = 1;
+        res_dim1 = dim1;
+    } else if (axis == 1) {
+        res_dim0 = dim0;
+        res_dim1 = 1;
+    } else {
+        throw std::runtime_error("Invalid sum axis");
+    }
+
+    Tensor *result = new Tensor(res_dim0, res_dim1, true);
+    float *res_ptr = result->data();
+
+    if (axis == 0) {
+        for (int i = 0; i < dim0; i++) {
+            for (int j = 0; j < dim1; j++) {
+                res_ptr[j] += a_ptr[i * dim1 + j];
+            }
+        }
+    } else {
+        for (int i = 0; i < dim0; i++) {
+            for (int j = 0; j < dim1; j++) {
+                res_ptr[i] += a_ptr[i * dim1 + j];
+            }
         }
     }
 

@@ -8,8 +8,10 @@ __all__ = [
     "Tensor",
     "cpu_add",
     "cpu_mul",
+    "cpu_sum",
     "gpu_add",
-    "gpu_mul"
+    "gpu_mul",
+    "gpu_sum"
 ]
 
 
@@ -31,7 +33,11 @@ def cpu_add(arg0: Tensor, arg1: Tensor) -> Tensor:
     pass
 def cpu_mul(arg0: Tensor, arg1: Tensor) -> Tensor:
     pass
+def cpu_sum(arg0: Tensor, arg1: int) -> Tensor:
+    pass
 def gpu_add(arg0: Tensor, arg1: Tensor) -> Tensor:
     pass
 def gpu_mul(arg0: Tensor, arg1: Tensor) -> Tensor:
+    pass
+def gpu_sum(arg0: Tensor, arg1: int) -> Tensor:
     pass

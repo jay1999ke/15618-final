@@ -10,8 +10,12 @@ namespace py = pybind11;
 
 class Tensor {
   public:
-    Tensor(size_t rows, size_t cols) : dim0(rows), dim1(cols) {
-        cpu_data = new float[rows * cols];
+    Tensor(size_t rows, size_t cols, bool set_zero = false)
+        : dim0(rows), dim1(cols) {
+        if (set_zero)
+            cpu_data = new float[rows * cols]();
+        else
+            cpu_data = new float[rows * cols];
         on_gpu = false;
         gpu_data = nullptr;
     }
@@ -74,11 +78,14 @@ Tensor *createGPUTensor(size_t rows, size_t cols);
 // cpu arith ops
 Tensor *cpu_add(Tensor *a, Tensor *b);
 Tensor *cpu_mul(Tensor *a, Tensor *b);
+Tensor *cpu_sum(Tensor *a, int axis);
 
 // gpu arith ops
 Tensor *gpu_add(Tensor *a, Tensor *b);
 Tensor *gpu_mul(Tensor *a, Tensor *b);
+Tensor *gpu_sum(Tensor *a, int axis);
 
 // kernels
 __global__ void _add(float *a, float *b, float *res, int dim0, int dim1);
 __global__ void _mul(float *a, float *b, float *res, int dim0, int dim1);
+__global__ void _sum(float *a, float *res, int dim0, int dim1, int axis);

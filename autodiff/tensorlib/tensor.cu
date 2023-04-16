@@ -86,3 +86,39 @@ Tensor *gpu_mul(Tensor *a, Tensor *b) {
 
     return result;
 }
+
+Tensor *gpu_sum(Tensor *a, int axis) {
+    a->onGpuAssert();
+
+    py::buffer_info a_info = a->request();
+
+    if (a_info.shape.size() != 2) {
+        throw std::runtime_error("Only 2D tensors supported");
+    }
+
+    int dim0 = a_info.shape[0];
+    int dim1 = a_info.shape[1];
+
+    int res_dim0, res_dim1;
+
+    if (axis == 0) {
+        res_dim0 = 1;
+        res_dim1 = dim1;
+    } else if (axis == 1) {
+        res_dim0 = dim0;
+        res_dim1 = 1;
+    } else {
+        throw std::runtime_error("Invalid sum axis");
+    }
+
+    Tensor *result = createGPUTensor(res_dim0, res_dim1);
+    cudaMemset(result->dataGpu(), 0, result->size());
+
+    const int threadsPerBlock = 512;
+    int blocks = (result->size() + threadsPerBlock - 1) / threadsPerBlock;
+
+    _sum<<<blocks, threadsPerBlock>>>(a->dataGpu(), result->dataGpu(), dim0,
+                                      dim1, axis);
+
+    return result;
+}
