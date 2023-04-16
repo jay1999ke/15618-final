@@ -14,16 +14,14 @@ link_directories(
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-file(GLOB h_source_files "${CMAKE_SOURCE_DIR}/blas/*.h")
-file(GLOB cpp_source_files "${CMAKE_SOURCE_DIR}/blas/*.cpp")
-file(GLOB cu_source_files "${CMAKE_SOURCE_DIR}/blas/*.cu")
-
-cuda_add_library(blas SHARED 
-  ${h_source_files}
-  ${cpp_source_files} 
-  ${cu_source_files}
+cuda_add_library(tensorlib SHARED 
+  "tensorlib/tensor.h"
+  "tensorlib/tensor.cpp"
+  "tensorlib/kernel.cu"
+  "tensorlib/tensor.cu"
+  "tensorlib/bindings.cpp"
 )
 
-target_link_libraries(blas ${PYTHON_LIBRARIES} cudart)
+target_link_libraries(tensorlib ${PYTHON_LIBRARIES} cudart)
 
-set_target_properties(blas PROPERTIES PREFIX "")
+set_target_properties(tensorlib PROPERTIES PREFIX "")
