@@ -1,12 +1,17 @@
 from autodiff import tensorlib
 
+
 class Operations:
     add = "add"
+    mul = "mul"
+
 
 CPU = {
-    "add": tensorlib.cpu_add
+    Operations.add: tensorlib.cpu_add,
+    Operations.mul: tensorlib.cpu_mul,
 }
 
 GPU = {
-    "add": tensorlib.gpu_add
+    Operations.add: tensorlib.gpu_add,
+    Operations.mul: tensorlib.gpu_mul,
 }

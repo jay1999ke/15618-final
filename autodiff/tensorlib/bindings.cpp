@@ -23,4 +23,9 @@ PYBIND11_MODULE(tensorlib, m) {
           py::return_value_policy::take_ownership);
     m.def("gpu_add", [](Tensor *a, Tensor *b) { return gpu_add(a, b); },
           py::return_value_policy::take_ownership);
+
+    m.def("cpu_mul", [](Tensor *a, Tensor *b) { return cpu_mul(a, b); },
+          py::return_value_policy::take_ownership);
+    m.def("gpu_mul", [](Tensor *a, Tensor *b) { return gpu_mul(a, b); },
+          py::return_value_policy::take_ownership);
 }

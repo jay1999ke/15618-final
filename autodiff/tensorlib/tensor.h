@@ -73,9 +73,12 @@ Tensor *createGPUTensor(size_t rows, size_t cols);
 
 // cpu arith ops
 Tensor *cpu_add(Tensor *a, Tensor *b);
+Tensor *cpu_mul(Tensor *a, Tensor *b);
 
 // gpu arith ops
 Tensor *gpu_add(Tensor *a, Tensor *b);
+Tensor *gpu_mul(Tensor *a, Tensor *b);
 
 // kernels
 __global__ void _add(float *a, float *b, float *res, int dim0, int dim1);
+__global__ void _mul(float *a, float *b, float *res, int dim0, int dim1);

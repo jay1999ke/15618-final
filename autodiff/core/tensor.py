@@ -53,6 +53,9 @@ class Tensor(object):
 
     def __add__(self, other):
         return BinaryOp(self, other, Operations.add)
+    
+    def __mul__(self, other):
+        return BinaryOp(self, other, Operations.mul)
 
 
 class BinaryOp(Tensor):
