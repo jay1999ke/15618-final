@@ -59,6 +59,9 @@ class Tensor(object):
     def sum(self, axis: int = 0):
         return Sum(self, axis)
     
+    def broadcast(self, axis: int, dim: 0):
+        return Broadcast(self, axis, dim)
+    
 
 def onCPU(*tensors: Tensor) -> bool:
     tOnCPU = tensors[0].onCPU()
@@ -97,6 +100,17 @@ class Sum(Tensor):
             value = tensorlib.cpu_sum(a.value, axis)
         else:
             value = tensorlib.gpu_sum(a.value, axis)
+        super().__init__(value)
+        self.requires_grad = a.requires_grad
+
+class Broadcast(Tensor):
+
+    def __init__(self, a: Tensor, axis: int, dim: int) -> None:
+        onCpu = onCPU(a)
+        if onCpu:
+            value = tensorlib.cpu_bct(a.value, axis, dim)
+        else:
+            value = tensorlib.gpu_bct(a.value, axis, dim)
         super().__init__(value)
         self.requires_grad = a.requires_grad
 

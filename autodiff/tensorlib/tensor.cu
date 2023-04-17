@@ -131,8 +131,6 @@ Tensor *gpu_bct(Tensor *a, int axis, int dim) {
         throw std::runtime_error("Only 2D tensors supported");
     }
 
-    auto a_ptr = static_cast<float *>(a_info.ptr);
-
     int dim0 = a_info.shape[0];
     int dim1 = a_info.shape[1];
 
