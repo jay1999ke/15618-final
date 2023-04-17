@@ -7,9 +7,11 @@ _Shape = typing.Tuple[int, ...]
 __all__ = [
     "Tensor",
     "cpu_add",
+    "cpu_bct",
     "cpu_mul",
     "cpu_sum",
     "gpu_add",
+    "gpu_bct",
     "gpu_mul",
     "gpu_sum"
 ]
@@ -31,11 +33,15 @@ class Tensor():
     pass
 def cpu_add(arg0: Tensor, arg1: Tensor) -> Tensor:
     pass
+def cpu_bct(arg0: Tensor, arg1: int, arg2: int) -> Tensor:
+    pass
 def cpu_mul(arg0: Tensor, arg1: Tensor) -> Tensor:
     pass
 def cpu_sum(arg0: Tensor, arg1: int) -> Tensor:
     pass
 def gpu_add(arg0: Tensor, arg1: Tensor) -> Tensor:
+    pass
+def gpu_bct(arg0: Tensor, arg1: int, arg2: int) -> Tensor:
     pass
 def gpu_mul(arg0: Tensor, arg1: Tensor) -> Tensor:
     pass

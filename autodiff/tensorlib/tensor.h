@@ -62,8 +62,14 @@ class Tensor {
     void _gpu();
     void setOnGpu(bool);
     size_t size() const { return dim0 * dim1 * sizeof(float); };
-    void onCpuAssert() { assert(on_gpu == false); };
-    void onGpuAssert() { assert(on_gpu == true); };
+    void onCpuAssert() {
+        if (on_gpu == true)
+            throw std::runtime_error("Tensor on GPU; Should be on CPU");
+    };
+    void onGpuAssert() {
+        if (on_gpu == false)
+            throw std::runtime_error("Tensor on CPU; Should be on GPU");
+    };
 
   private:
     size_t dim0, dim1;
@@ -79,13 +85,17 @@ Tensor *createGPUTensor(size_t rows, size_t cols);
 Tensor *cpu_add(Tensor *a, Tensor *b);
 Tensor *cpu_mul(Tensor *a, Tensor *b);
 Tensor *cpu_sum(Tensor *a, int axis);
+Tensor *cpu_bct(Tensor *a, int axis, int dim);
 
 // gpu arith ops
 Tensor *gpu_add(Tensor *a, Tensor *b);
 Tensor *gpu_mul(Tensor *a, Tensor *b);
 Tensor *gpu_sum(Tensor *a, int axis);
+Tensor *gpu_bct(Tensor *a, int axis, int dim);
 
 // kernels
 __global__ void _add(float *a, float *b, float *res, int dim0, int dim1);
 __global__ void _mul(float *a, float *b, float *res, int dim0, int dim1);
 __global__ void _sum(float *a, float *res, int dim0, int dim1, int axis);
+__global__ void _bct(float *a, float *res, int res_dim0, int res_dim1,
+                     int axis);

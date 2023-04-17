@@ -40,3 +40,23 @@ __global__ void _sum(float *a, float *res, int dim0, int dim1, int axis) {
         res[idx] = temp_result;
     }
 }
+
+__global__ void _bct(float *a, float *res, int res_dim0, int res_dim1,
+                     int axis) {
+    unsigned int idx = blockIdx.x * blockDim.x + threadIdx.x;
+
+    int dim;
+    if (axis == 0) {
+        dim = res_dim1;
+    } else {
+        dim = res_dim0;
+    }
+
+    if (idx < res_dim0 * res_dim1) {
+        if (axis == 0)
+            res[idx] = a[idx % dim];
+        else {
+            res[idx] = a[idx / dim];
+        }
+    }
+}

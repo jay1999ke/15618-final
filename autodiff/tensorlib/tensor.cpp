@@ -136,3 +136,49 @@ Tensor *cpu_sum(Tensor *a, int axis) {
 
     return result;
 }
+
+Tensor *cpu_bct(Tensor *a, int axis, int dim) {
+    a->onCpuAssert();
+
+    py::buffer_info a_info = a->request();
+
+    if (a_info.shape.size() != 2) {
+        throw std::runtime_error("Only 2D tensors supported");
+    }
+
+    auto a_ptr = static_cast<float *>(a_info.ptr);
+
+    int dim0 = a_info.shape[0];
+    int dim1 = a_info.shape[1];
+
+    int res_dim0, res_dim1;
+
+    if (axis == 0) {
+        res_dim0 = dim;
+        res_dim1 = dim1;
+    } else if (axis == 1) {
+        res_dim0 = dim0;
+        res_dim1 = dim;
+    } else {
+        throw std::runtime_error("Invalid sum axis");
+    }
+
+    Tensor *result = new Tensor(res_dim0, res_dim1);
+    float *res_ptr = result->data();
+
+    if (axis == 0) {
+        for (int i = 0; i < res_dim0; i++) {
+            for (int j = 0; j < res_dim1; j++) {
+                res_ptr[i * res_dim1 + j] = a_ptr[j];
+            }
+        }
+    } else {
+        for (int i = 0; i < res_dim0; i++) {
+            for (int j = 0; j < res_dim1; j++) {
+                res_ptr[i * res_dim1 + j] = a_ptr[i];
+            }
+        }
+    }
+
+    return result;
+}

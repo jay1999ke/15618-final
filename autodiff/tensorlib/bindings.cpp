@@ -33,4 +33,11 @@ PYBIND11_MODULE(tensorlib, m) {
           py::return_value_policy::take_ownership);
     m.def("gpu_sum", [](Tensor *a, int axis) { return gpu_sum(a, axis); },
           py::return_value_policy::take_ownership);
+
+    m.def("cpu_bct",
+          [](Tensor *a, int axis, int dim) { return cpu_bct(a, axis, dim); },
+          py::return_value_policy::take_ownership);
+    m.def("gpu_bct",
+          [](Tensor *a, int axis, int dim) { return gpu_bct(a, axis, dim); },
+          py::return_value_policy::take_ownership);
 }

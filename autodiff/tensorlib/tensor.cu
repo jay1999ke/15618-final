@@ -112,13 +112,49 @@ Tensor *gpu_sum(Tensor *a, int axis) {
     }
 
     Tensor *result = createGPUTensor(res_dim0, res_dim1);
-    cudaMemset(result->dataGpu(), 0, result->size());
 
     const int threadsPerBlock = 512;
     int blocks = (result->size() + threadsPerBlock - 1) / threadsPerBlock;
 
     _sum<<<blocks, threadsPerBlock>>>(a->dataGpu(), result->dataGpu(), dim0,
                                       dim1, axis);
+
+    return result;
+}
+
+Tensor *gpu_bct(Tensor *a, int axis, int dim) {
+    a->onGpuAssert();
+
+    py::buffer_info a_info = a->request();
+
+    if (a_info.shape.size() != 2) {
+        throw std::runtime_error("Only 2D tensors supported");
+    }
+
+    auto a_ptr = static_cast<float *>(a_info.ptr);
+
+    int dim0 = a_info.shape[0];
+    int dim1 = a_info.shape[1];
+
+    int res_dim0, res_dim1;
+
+    if (axis == 0) {
+        res_dim0 = dim;
+        res_dim1 = dim1;
+    } else if (axis == 1) {
+        res_dim0 = dim0;
+        res_dim1 = dim;
+    } else {
+        throw std::runtime_error("Invalid sum axis");
+    }
+
+    Tensor *result = createGPUTensor(res_dim0, res_dim1);
+
+    const int threadsPerBlock = 512;
+    int blocks = (result->size() + threadsPerBlock - 1) / threadsPerBlock;
+
+    _bct<<<blocks, threadsPerBlock>>>(a->dataGpu(), result->dataGpu(), res_dim0,
+                                      res_dim1, axis);
 
     return result;
 }
