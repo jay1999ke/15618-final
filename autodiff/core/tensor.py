@@ -1,4 +1,6 @@
 import numpy as np
+from typing import Tuple, List
+
 from autodiff import tensorlib
 from autodiff.core import exceptions
 
@@ -28,6 +30,7 @@ class Tensor(object):
             self.value: tensorlib.Tensor = object
         self.grad: Tensor = None
         self.requires_grad = requires_grad
+        self.shape: Tuple[int, int] = self.value.rows(), self.value.cols()
 
     def onCPU(self) -> bool:
         return self.value.onCPU()
@@ -55,25 +58,55 @@ class Tensor(object):
 
     def __mul__(self, other):
         return Multiply(self, other)
-    
+
     def sum(self, axis: int = 0):
         return Sum(self, axis)
-    
+
     def broadcast(self, axis: int, dim: 0):
         return Broadcast(self, axis, dim)
-    
+
 
 def onCPU(*tensors: Tensor) -> bool:
     tOnCPU = tensors[0].onCPU()
     for tensor in tensors:
         assert tOnCPU == tensor.onCPU(), "Tensors are not on the same device"
     return tOnCPU
-    
+
+
+def _broadcast(a: Tensor, b: Tensor) -> Tuple[Tensor, Tensor]:
+    """Broadcast to match shape"""
+    if a.shape == b.shape:
+        pass
+    elif a.shape[0] == b.shape[0]:
+        if a.shape[1] == 1:
+            a = a.broadcast(axis=1, dim=b.shape[1])
+        elif b.shape[1] == 1:
+            b = b.broadcast(axis=1, dim=a.shape[1])
+        else:
+            raise exceptions.ShapeMismatchException("Shapes don't match")
+    elif a.shape[1] == b.shape[1]:
+        if a.shape[0] == 1:
+            a = a.broadcast(axis=0, dim=b.shape[0])
+        elif b.shape[0] == 1:
+            b = b.broadcast(axis=0, dim=a.shape[0])
+        else:
+            raise exceptions.ShapeMismatchException("Shapes don't match")
+    elif a.shape[0] == (1, 1):
+        a = a.broadcast(axis=0, dim=b.shape[0])
+        a = a.broadcast(axis=1, dim=b.shape[1])
+    elif b.shape == (1, 1):
+        b = b.broadcast(axis=0, dim=a.shape[0])
+        b = b.broadcast(axis=1, dim=a.shape[1])
+    else:
+        raise exceptions.ShapeMismatchException("Shapes don't match")
+    return a, b
+
 
 class Add(Tensor):
 
     def __init__(self, a: Tensor, b: Tensor) -> None:
         onCpu = onCPU(a, b)
+        a, b = _broadcast(a, b)
         if onCpu:
             value = tensorlib.cpu_add(a.value, b.value)
         else:
@@ -81,16 +114,19 @@ class Add(Tensor):
         super().__init__(value)
         self.requires_grad = a.requires_grad or b.requires_grad
 
+
 class Multiply(Tensor):
 
     def __init__(self, a: Tensor, b: Tensor) -> None:
         onCpu = onCPU(a, b)
+        a, b = _broadcast(a, b)
         if onCpu:
             value = tensorlib.cpu_mul(a.value, b.value)
         else:
             value = tensorlib.gpu_mul(a.value, b.value)
         super().__init__(value)
         self.requires_grad = a.requires_grad or b.requires_grad
+
 
 class Sum(Tensor):
 
@@ -103,6 +139,7 @@ class Sum(Tensor):
         super().__init__(value)
         self.requires_grad = a.requires_grad
 
+
 class Broadcast(Tensor):
 
     def __init__(self, a: Tensor, axis: int, dim: int) -> None:
@@ -113,4 +150,3 @@ class Broadcast(Tensor):
             value = tensorlib.gpu_bct(a.value, axis, dim)
         super().__init__(value)
         self.requires_grad = a.requires_grad
-

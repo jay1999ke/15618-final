@@ -1,3 +1,6 @@
 
 class AutoDiffException(Exception):
-    pass
+    """Base Exception"""
+
+class ShapeMismatchException(AutoDiffException):
+    """Shape Mismatch Exception"""

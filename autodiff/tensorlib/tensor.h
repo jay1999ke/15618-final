@@ -73,7 +73,7 @@ class Tensor {
             throw std::runtime_error("Tensor on CPU; Should be on GPU");
     };
     void sameShapeAssert(Tensor *other) {
-        if (rows() != other->rows() || cols() != other->rows())
+        if (rows() != other->rows() || cols() != other->cols())
             throw std::runtime_error("Tensor shapes don't match");
     }
 
