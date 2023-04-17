@@ -3,13 +3,14 @@ from typing import Tuple, List
 
 from autodiff import tensorlib
 from autodiff.core import exceptions
+from autodiff.tensorlib import Tensor as InternalTensor
 
 
 def make_numpy(obj: any):
     t_type = type(obj)
     if t_type == int or t_type == float or t_type == bool:
         obj = np.array([[obj]])
-    if isinstance(obj, tensorlib.Tensor):
+    if isinstance(obj, InternalTensor):
         return obj
     elif isinstance(obj, np.ndarray):
         pass
@@ -25,38 +26,48 @@ class Tensor(object):
     def __init__(self, object, requires_grad=False) -> None:
         object = make_numpy(object)
         if isinstance(object, np.ndarray):
-            self.value: tensorlib.Tensor = tensorlib.Tensor(object)
+            self.value: InternalTensor = InternalTensor(object)
         else:
-            self.value: tensorlib.Tensor = object
+            self.value: InternalTensor = object
         self.grad: Tensor = None
         self._requires_grad = False
         self.shape: Tuple[int, int] = self.value.rows(), self.value.cols()
         self.requires_grad = requires_grad
+        # Store topological lineage locally
+        self.parents: List[GraphNode] = []
 
     @property
     def requires_grad(self) -> bool:
         return self._requires_grad
-    
+
     @requires_grad.setter
     def requires_grad(self, val: bool) -> None:
         if val:
             self._requires_grad = True
             if not self.grad:
-                self.grad = tensorlib.Tensor(*self.shape)
+                self.grad: Tensor = Tensor(
+                    InternalTensor(*self.shape), requires_grad=False
+                )
+                if not self.value.onCPU():
+                    self.grad.gpu()  # move grad to gpu is value is on gpu
                 self.zero_grad()
         else:
-            self.grad: tensorlib.Tensor = None
-        
+            self.grad: Tensor = None
 
     def onCPU(self) -> bool:
-        return self.value.onCPU()
-    
+        onCpu = self.value.onCPU()
+        if self.grad:
+            assert onCpu == self.grad.onCPU()
+        return onCpu
+
     def zero_grad(self) -> None:
         if self._requires_grad:
             if self.onCPU():
-                tensorlib.cpu_set_zero(self.grad)
+                tensorlib.cpu_set_zero(self.grad.value)
             else:
-                tensorlib.gpu_set_zero(self.grad)
+                tensorlib.gpu_set_zero(self.grad.value)
+        for parent in self.parents:
+            parent.var.zero_grad()
 
     def __repr__(self) -> str:
         return self.value.__repr__()
@@ -87,6 +98,45 @@ class Tensor(object):
 
     def broadcast(self, axis: int, dim: 0):
         return Broadcast(self, axis, dim)
+
+    def backward(self, gradient) -> None:
+        """Propagates appropriate gradient to 
+        local reverse computational sub-graph"""
+
+        if not self.requires_grad:
+            raise exceptions.AutoDiffException(
+                "Gradient called on a non-differentiable variable")
+
+        if not isinstance(gradient, Tensor):
+            raise exceptions.AutoDiffException(
+                "Gradient is not of type Tensor")
+
+        if gradient is None:
+            if self.shape == (1, 1):
+                gradient = Tensor(1)
+            else:
+                raise exceptions.AutoDiffException("Gradient not provided")
+
+        # swap old gradient internal tensor with new one
+        # tensorlib does not support inplace operations
+        self.grad.value = (self.grad + gradient).value
+
+        for parent in self.parents:
+            parent.gradient_prop(gradient)
+
+
+class GraphNode(object):
+    """A Node on a reverse computation graph"""
+
+    def __init__(self, tensor: Tensor, vjp):
+        assert type(vjp) == type(self.__init__), "None-Callable generated"
+
+        self.var: Tensor = tensor
+        self.vjp = vjp
+
+    def gradient_prop(self, gradient):
+        if self.var.requires_grad:
+            self.var.backward(self.vjp(gradient))
 
 
 def onCPU(*tensors: Tensor) -> bool:
