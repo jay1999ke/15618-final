@@ -1,7 +1,6 @@
 import numpy as np
 from autodiff import tensorlib
 from autodiff.core import exceptions
-from autodiff.core.operations import Operations, CPU, GPU
 
 
 def make_numpy(obj: any):
@@ -52,21 +51,52 @@ class Tensor(object):
             self.grad.gpuFree()
 
     def __add__(self, other):
-        return BinaryOp(self, other, Operations.add)
-    
+        return Add(self, other)
+
     def __mul__(self, other):
-        return BinaryOp(self, other, Operations.mul)
+        return Multiply(self, other)
+    
+    def sum(self, axis: int = 0):
+        return Sum(self, axis)
+    
 
+def onCPU(*tensors: Tensor) -> bool:
+    tOnCPU = tensors[0].onCPU()
+    for tensor in tensors:
+        assert tOnCPU == tensor.onCPU(), "Tensors are not on the same device"
+    return tOnCPU
+    
 
-class BinaryOp(Tensor):
+class Add(Tensor):
 
-    def __init__(self, a: Tensor, b: Tensor, op: str) -> None:
-        aOnCPU = a.onCPU()
-        bOnCPU = b.onCPU()
-        assert aOnCPU == bOnCPU, "Tensors are not on the same device"
-        if aOnCPU:
-            value = CPU[op](a.value, b.value)
+    def __init__(self, a: Tensor, b: Tensor) -> None:
+        onCpu = onCPU(a, b)
+        if onCpu:
+            value = tensorlib.cpu_add(a.value, b.value)
         else:
-            value = GPU[op](a.value, b.value)
+            value = tensorlib.gpu_add(a.value, b.value)
         super().__init__(value)
         self.requires_grad = a.requires_grad or b.requires_grad
+
+class Multiply(Tensor):
+
+    def __init__(self, a: Tensor, b: Tensor) -> None:
+        onCpu = onCPU(a, b)
+        if onCpu:
+            value = tensorlib.cpu_mul(a.value, b.value)
+        else:
+            value = tensorlib.gpu_mul(a.value, b.value)
+        super().__init__(value)
+        self.requires_grad = a.requires_grad or b.requires_grad
+
+class Sum(Tensor):
+
+    def __init__(self, a: Tensor, axis: int) -> None:
+        onCpu = onCPU(a)
+        if onCpu:
+            value = tensorlib.cpu_sum(a.value, axis)
+        else:
+            value = tensorlib.gpu_sum(a.value, axis)
+        super().__init__(value)
+        self.requires_grad = a.requires_grad
+
