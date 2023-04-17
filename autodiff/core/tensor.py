@@ -29,11 +29,34 @@ class Tensor(object):
         else:
             self.value: tensorlib.Tensor = object
         self.grad: Tensor = None
-        self.requires_grad = requires_grad
+        self._requires_grad = False
         self.shape: Tuple[int, int] = self.value.rows(), self.value.cols()
+        self.requires_grad = requires_grad
+
+    @property
+    def requires_grad(self) -> bool:
+        return self._requires_grad
+    
+    @requires_grad.setter
+    def requires_grad(self, val: bool) -> None:
+        if val:
+            self._requires_grad = True
+            if not self.grad:
+                self.grad = tensorlib.Tensor(*self.shape)
+                self.zero_grad()
+        else:
+            self.grad: tensorlib.Tensor = None
+        
 
     def onCPU(self) -> bool:
         return self.value.onCPU()
+    
+    def zero_grad(self) -> None:
+        if self._requires_grad:
+            if self.onCPU():
+                tensorlib.cpu_set_zero(self.grad)
+            else:
+                tensorlib.gpu_set_zero(self.grad)
 
     def __repr__(self) -> str:
         return self.value.__repr__()
