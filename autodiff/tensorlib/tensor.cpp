@@ -28,17 +28,10 @@ std::string Tensor::repr() {
 Tensor *cpu_add(Tensor *a, Tensor *b) {
     a->onCpuAssert();
     b->onCpuAssert();
+    a->sameShapeAssert(b);
 
     py::buffer_info a_info = a->request();
     py::buffer_info b_info = b->request();
-
-    if (a_info.shape.size() != b_info.shape.size()) {
-        throw std::runtime_error("Dimentions don't match");
-    }
-
-    if (a_info.shape.size() != 2) {
-        throw std::runtime_error("Only 2D tensors supported");
-    }
 
     auto a_ptr = static_cast<float *>(a_info.ptr);
     auto b_ptr = static_cast<float *>(b_info.ptr);
@@ -61,17 +54,10 @@ Tensor *cpu_add(Tensor *a, Tensor *b) {
 Tensor *cpu_mul(Tensor *a, Tensor *b) {
     a->onCpuAssert();
     b->onCpuAssert();
+    a->sameShapeAssert(b);
 
     py::buffer_info a_info = a->request();
     py::buffer_info b_info = b->request();
-
-    if (a_info.shape.size() != b_info.shape.size()) {
-        throw std::runtime_error("Dimentions don't match");
-    }
-
-    if (a_info.shape.size() != 2) {
-        throw std::runtime_error("Only 2D tensors supported");
-    }
 
     auto a_ptr = static_cast<float *>(a_info.ptr);
     auto b_ptr = static_cast<float *>(b_info.ptr);
@@ -95,10 +81,6 @@ Tensor *cpu_sum(Tensor *a, int axis) {
     a->onCpuAssert();
 
     py::buffer_info a_info = a->request();
-
-    if (a_info.shape.size() != 2) {
-        throw std::runtime_error("Only 2D tensors supported");
-    }
 
     auto a_ptr = static_cast<float *>(a_info.ptr);
 
@@ -141,10 +123,6 @@ Tensor *cpu_bct(Tensor *a, int axis, int dim) {
     a->onCpuAssert();
 
     py::buffer_info a_info = a->request();
-
-    if (a_info.shape.size() != 2) {
-        throw std::runtime_error("Only 2D tensors supported");
-    }
 
     auto a_ptr = static_cast<float *>(a_info.ptr);
 

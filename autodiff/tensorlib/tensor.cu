@@ -34,16 +34,10 @@ void Tensor::gpuFree() {
 Tensor *gpu_add(Tensor *a, Tensor *b) {
     a->onGpuAssert();
     b->onGpuAssert();
+    a->sameShapeAssert(b);
+
     py::buffer_info a_info = a->request();
     py::buffer_info b_info = b->request();
-
-    if (a_info.shape.size() != b_info.shape.size()) {
-        throw std::runtime_error("Dimentions don't match");
-    }
-
-    if (a_info.shape.size() != 2) {
-        throw std::runtime_error("Only 2D tensors supported");
-    }
 
     int dim0 = a_info.shape[0];
     int dim1 = a_info.shape[1];
@@ -62,16 +56,10 @@ Tensor *gpu_add(Tensor *a, Tensor *b) {
 Tensor *gpu_mul(Tensor *a, Tensor *b) {
     a->onGpuAssert();
     b->onGpuAssert();
+    a->sameShapeAssert(b);
+    
     py::buffer_info a_info = a->request();
     py::buffer_info b_info = b->request();
-
-    if (a_info.shape.size() != b_info.shape.size()) {
-        throw std::runtime_error("Dimentions don't match");
-    }
-
-    if (a_info.shape.size() != 2) {
-        throw std::runtime_error("Only 2D tensors supported");
-    }
 
     int dim0 = a_info.shape[0];
     int dim1 = a_info.shape[1];
@@ -91,10 +79,6 @@ Tensor *gpu_sum(Tensor *a, int axis) {
     a->onGpuAssert();
 
     py::buffer_info a_info = a->request();
-
-    if (a_info.shape.size() != 2) {
-        throw std::runtime_error("Only 2D tensors supported");
-    }
 
     int dim0 = a_info.shape[0];
     int dim1 = a_info.shape[1];
@@ -126,10 +110,6 @@ Tensor *gpu_bct(Tensor *a, int axis, int dim) {
     a->onGpuAssert();
 
     py::buffer_info a_info = a->request();
-
-    if (a_info.shape.size() != 2) {
-        throw std::runtime_error("Only 2D tensors supported");
-    }
 
     int dim0 = a_info.shape[0];
     int dim1 = a_info.shape[1];

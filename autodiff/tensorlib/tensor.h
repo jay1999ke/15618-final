@@ -62,6 +62,8 @@ class Tensor {
     void _gpu();
     void setOnGpu(bool);
     size_t size() const { return dim0 * dim1 * sizeof(float); };
+
+    // safetly assertions
     void onCpuAssert() {
         if (on_gpu == true)
             throw std::runtime_error("Tensor on GPU; Should be on CPU");
@@ -70,6 +72,10 @@ class Tensor {
         if (on_gpu == false)
             throw std::runtime_error("Tensor on CPU; Should be on GPU");
     };
+    void sameShapeAssert(Tensor *other) {
+        if (rows() != other->rows() || cols() != other->rows())
+            throw std::runtime_error("Tensor shapes don't match");
+    }
 
   private:
     size_t dim0, dim1;
