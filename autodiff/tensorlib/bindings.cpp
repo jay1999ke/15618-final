@@ -40,4 +40,9 @@ PYBIND11_MODULE(tensorlib, m) {
     m.def("gpu_bct",
           [](Tensor *a, int axis, int dim) { return gpu_bct(a, axis, dim); },
           py::return_value_policy::take_ownership);
+
+    m.def("cpu_set_zero", [](Tensor *a) { return cpu_set_zero(a); },
+          py::return_value_policy::take_ownership);
+    m.def("gpu_set_zero", [](Tensor *a) { return gpu_set_zero(a); },
+          py::return_value_policy::take_ownership);
 }

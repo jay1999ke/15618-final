@@ -31,6 +31,10 @@ void Tensor::gpuFree() {
     setOnGpu(false);
 }
 
+void gpu_set_zero(Tensor *a) {
+    cudaMemset(a->dataGpu(), 0, a->size());
+}
+
 Tensor *gpu_add(Tensor *a, Tensor *b) {
     a->onGpuAssert();
     b->onGpuAssert();

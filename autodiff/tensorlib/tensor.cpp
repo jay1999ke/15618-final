@@ -25,6 +25,10 @@ std::string Tensor::repr() {
     return str;
 };
 
+void cpu_set_zero(Tensor *a) {
+    memset(a->data(), 0, a->size());
+}
+
 Tensor *cpu_add(Tensor *a, Tensor *b) {
     a->onCpuAssert();
     b->onCpuAssert();

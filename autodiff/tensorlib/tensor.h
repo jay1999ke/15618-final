@@ -88,12 +88,14 @@ class Tensor {
 Tensor *createGPUTensor(size_t rows, size_t cols);
 
 // cpu arith ops
+void cpu_set_zero(Tensor *a);
 Tensor *cpu_add(Tensor *a, Tensor *b);
 Tensor *cpu_mul(Tensor *a, Tensor *b);
 Tensor *cpu_sum(Tensor *a, int axis);
 Tensor *cpu_bct(Tensor *a, int axis, int dim);
 
 // gpu arith ops
+void gpu_set_zero(Tensor *a);
 Tensor *gpu_add(Tensor *a, Tensor *b);
 Tensor *gpu_mul(Tensor *a, Tensor *b);
 Tensor *gpu_sum(Tensor *a, int axis);
