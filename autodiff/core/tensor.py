@@ -95,7 +95,7 @@ class Tensor(object):
     def broadcast(self, axis: int, dim: 0):
         return Broadcast(self, axis, dim)
 
-    def backward(self, gradient = None) -> None:
+    def backward(self, gradient=None) -> None:
         """Propagates appropriate gradient to 
         local reverse computational sub-graph"""
 
@@ -160,6 +160,12 @@ def _broadcast(a: Tensor, b: Tensor) -> Tuple[Tensor, Tensor]:
     elif b.shape == (1, 1):
         b = b.broadcast(axis=0, dim=a.shape[0])
         b = b.broadcast(axis=1, dim=a.shape[1])
+    elif a.shape[0] == 1: # potential broadcast (TODO: check correctness)
+        a = a.broadcast(axis=0, dim=b.shape[0])
+        a, b = _broadcast(a, b)
+    elif b.shape[0] == 1: # potential broadcast (TODO: check correctness)
+        b = b.broadcast(axis=0, dim=a.shape[0])
+        a, b = _broadcast(a, b)
     else:
         raise exceptions.ShapeMismatchException("Shapes don't match")
     return a, b
