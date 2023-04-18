@@ -24,6 +24,16 @@ void Tensor::cpu() {
         cudaMemcpy(data(), dataGpu(), size(), cudaMemcpyDeviceToHost);
 }
 
+void Tensor::maintain() {
+    if (on_gpu) {
+        if (dataGpu() != nullptr)
+            cudaMemcpy(data(), dataGpu(), size(), cudaMemcpyDeviceToHost);
+    } else {
+        if (dataGpu() != nullptr)
+            cudaMemcpy(dataGpu(), data(), size(), cudaMemcpyHostToDevice);
+    }
+}
+
 void Tensor::gpuFree() {
     if (dataGpu() != nullptr)
         cudaFree(dataGpu());
@@ -31,9 +41,7 @@ void Tensor::gpuFree() {
     setOnGpu(false);
 }
 
-void gpu_set_zero(Tensor *a) {
-    cudaMemset(a->dataGpu(), 0, a->size());
-}
+void gpu_set_zero(Tensor *a) { cudaMemset(a->dataGpu(), 0, a->size()); }
 
 Tensor *gpu_add(Tensor *a, Tensor *b) {
     a->onGpuAssert();
@@ -61,7 +69,7 @@ Tensor *gpu_mul(Tensor *a, Tensor *b) {
     a->onGpuAssert();
     b->onGpuAssert();
     a->sameShapeAssert(b);
-    
+
     py::buffer_info a_info = a->request();
     py::buffer_info b_info = b->request();
 
