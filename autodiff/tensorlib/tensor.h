@@ -50,7 +50,6 @@ class Tensor {
     void cpu();
     void gpuFree();
     bool onCPU() { return !on_gpu; };
-    void maintain();
     std::string repr();
     py::buffer_info request() {
         return py::buffer_info(
@@ -60,7 +59,7 @@ class Tensor {
 
     // cpp internal ops
     float *dataGpu() { return gpu_data; }
-    void gpu_alloc();
+    void _gpu();
     void setOnGpu(bool);
     size_t size() const { return dim0 * dim1 * sizeof(float); };
 
@@ -86,7 +85,7 @@ class Tensor {
 };
 
 // gpu helpers
-Tensor *createGPUTensor(size_t rows, size_t cols, bool set_zero);
+Tensor *createGPUTensor(size_t rows, size_t cols);
 
 // cpu arith ops
 void cpu_set_zero(Tensor *a);

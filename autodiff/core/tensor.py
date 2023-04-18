@@ -1,16 +1,15 @@
 import numpy as np
 from typing import Tuple, List
 
-from autodiff import tensorlib
 from autodiff.core import exceptions
-from autodiff.tensorlib import Tensor as InternalTensor
+from autodiff.core.internal import CTensor
 
 
 def make_numpy(obj: any):
     t_type = type(obj)
     if t_type == int or t_type == float or t_type == bool:
         obj = np.array([[obj]])
-    if isinstance(obj, InternalTensor):
+    if isinstance(obj, CTensor):
         return obj
     elif isinstance(obj, np.ndarray):
         pass
@@ -24,11 +23,11 @@ def make_numpy(obj: any):
 class Tensor(object):
 
     def __init__(self, object, requires_grad=False) -> None:
-        object = make_numpy(object)
-        if isinstance(object, np.ndarray):
-            self.value: InternalTensor = InternalTensor(object)
+        if isinstance(object, CTensor):
+            self.value: CTensor = object
         else:
-            self.value: InternalTensor = object
+            object = make_numpy(object)
+            self.value: CTensor = CTensor(object)
         self.grad: Tensor = None
         self._requires_grad = False
         self.shape: Tuple[int, int] = self.value.rows(), self.value.cols()
@@ -46,7 +45,7 @@ class Tensor(object):
             self._requires_grad = True
             if not self.grad:
                 self.grad: Tensor = Tensor(
-                    InternalTensor(*self.shape), requires_grad=False
+                    CTensor(*self.shape), requires_grad=False
                 )
                 if not self.value.onCPU():
                     self.grad.gpu()  # move grad to gpu is value is on gpu
@@ -62,10 +61,7 @@ class Tensor(object):
 
     def zero_grad(self) -> None:
         if self._requires_grad:
-            if self.onCPU():
-                tensorlib.cpu_set_zero(self.grad.value)
-            else:
-                tensorlib.gpu_set_zero(self.grad.value)
+            self.grad.value.set_zero()
         for parent in self.parents:
             parent.var.zero_grad()
 
@@ -97,9 +93,10 @@ class Tensor(object):
         return Sum(self, axis)
 
     def broadcast(self, axis: int, dim: 0):
+        print("in Tensor")
         return Broadcast(self, axis, dim)
 
-    def backward(self, gradient) -> None:
+    def backward(self, gradient = None) -> None:
         """Propagates appropriate gradient to 
         local reverse computational sub-graph"""
 
@@ -117,6 +114,8 @@ class Tensor(object):
             else:
                 raise exceptions.AutoDiffException("Gradient not provided")
 
+        assert gradient.requires_grad == False, "Recursion hell?"
+
         # swap old gradient internal tensor with new one
         # tensorlib does not support inplace operations
         self.grad.value = (self.grad + gradient).value
@@ -129,21 +128,13 @@ class GraphNode(object):
     """A Node on a reverse computation graph"""
 
     def __init__(self, tensor: Tensor, vjp):
-        assert type(vjp) == type(self.__init__), "None-Callable generated"
-
         self.var: Tensor = tensor
         self.vjp = vjp
 
-    def gradient_prop(self, gradient):
+    def gradient_prop(self, gradient: Tensor):
+        assert gradient.requires_grad == False, "Recursion hell?"
         if self.var.requires_grad:
             self.var.backward(self.vjp(gradient))
-
-
-def onCPU(*tensors: Tensor) -> bool:
-    tOnCPU = tensors[0].onCPU()
-    for tensor in tensors:
-        assert tOnCPU == tensor.onCPU(), "Tensors are not on the same device"
-    return tOnCPU
 
 
 def _broadcast(a: Tensor, b: Tensor) -> Tuple[Tensor, Tensor]:
@@ -161,6 +152,7 @@ def _broadcast(a: Tensor, b: Tensor) -> Tuple[Tensor, Tensor]:
         if a.shape[0] == 1:
             a = a.broadcast(axis=0, dim=b.shape[0])
         elif b.shape[0] == 1:
+            print("in _broadcast")
             b = b.broadcast(axis=0, dim=a.shape[0])
         else:
             raise exceptions.ShapeMismatchException("Shapes don't match")
@@ -178,48 +170,70 @@ def _broadcast(a: Tensor, b: Tensor) -> Tuple[Tensor, Tensor]:
 class Add(Tensor):
 
     def __init__(self, a: Tensor, b: Tensor) -> None:
-        onCpu = onCPU(a, b)
+        print(a.shape, b.shape)
         a, b = _broadcast(a, b)
-        if onCpu:
-            value = tensorlib.cpu_add(a.value, b.value)
-        else:
-            value = tensorlib.gpu_add(a.value, b.value)
+        print(a.shape, b.shape)
+        value = a.value + b.value
+        print(value)
         super().__init__(value)
         self.requires_grad = a.requires_grad or b.requires_grad
+
+        if a.requires_grad:
+            def vjp_a(gradient: Tensor) -> Tensor:
+                return gradient
+            self.parents.append(GraphNode(tensor=a, vjp=vjp_a))
+
+        if b.requires_grad:
+            def vjp_b(gradient: Tensor) -> Tensor:
+                return gradient
+            self.parents.append(GraphNode(tensor=b, vjp=vjp_b))
+        print("add complete")
 
 
 class Multiply(Tensor):
 
     def __init__(self, a: Tensor, b: Tensor) -> None:
-        onCpu = onCPU(a, b)
         a, b = _broadcast(a, b)
-        if onCpu:
-            value = tensorlib.cpu_mul(a.value, b.value)
-        else:
-            value = tensorlib.gpu_mul(a.value, b.value)
+        value = a.value * b.value
         super().__init__(value)
         self.requires_grad = a.requires_grad or b.requires_grad
+
+        if a.requires_grad:
+            def vjp_a(gradient: Tensor) -> Tensor:
+                return Tensor(gradient.value * b.value)
+            self.parents.append(GraphNode(tensor=a, vjp=vjp_a))
+
+        if b.requires_grad:
+            def vjp_b(gradient: Tensor) -> Tensor:
+                return Tensor(gradient.value * a.value)
+            self.parents.append(GraphNode(tensor=b, vjp=vjp_b))
 
 
 class Sum(Tensor):
 
     def __init__(self, a: Tensor, axis: int) -> None:
-        onCpu = onCPU(a)
-        if onCpu:
-            value = tensorlib.cpu_sum(a.value, axis)
-        else:
-            value = tensorlib.gpu_sum(a.value, axis)
-        super().__init__(value)
+        super().__init__(a.value.sum(axis=axis))
         self.requires_grad = a.requires_grad
+
+        if a.requires_grad:
+            assert axis < 2, "Axis greater than 1"
+            dim = a.shape[axis]
+
+            def vjp(gradient: Tensor) -> Tensor:
+                gradient = gradient.value.broadcast(axis=axis, dim=dim)
+                return Tensor(gradient)
+            self.parents.append(GraphNode(tensor=a, vjp=vjp))
 
 
 class Broadcast(Tensor):
 
     def __init__(self, a: Tensor, axis: int, dim: int) -> None:
-        onCpu = onCPU(a)
-        if onCpu:
-            value = tensorlib.cpu_bct(a.value, axis, dim)
-        else:
-            value = tensorlib.gpu_bct(a.value, axis, dim)
-        super().__init__(value)
+        print("In Broadcast")
+        super().__init__(a.value.broadcast(axis=axis, dim=dim))
         self.requires_grad = a.requires_grad
+
+        if a.requires_grad:
+            def vjp(gradient: Tensor) -> Tensor:
+                gradient = gradient.value.sum(axis=axis)
+                return Tensor(gradient)
+            self.parents.append(GraphNode(tensor=a, vjp=vjp))

@@ -2,7 +2,7 @@
 
 std::string Tensor::repr() {
     if (on_gpu)
-        maintain();
+        cpu();
     std::string str = "tensor([";
     for (int i = 0; i < dim0; i++) {
         if (i != 0)
