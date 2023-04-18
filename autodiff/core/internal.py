@@ -1,0 +1,100 @@
+import numpy as np
+
+from autodiff import tensorlib
+from autodiff.core import exceptions
+
+def make_numpy(obj: any):
+    t_type = type(obj)
+    if t_type == int or t_type == float or t_type == bool:
+        obj = np.array([[obj]])
+    if isinstance(obj, tensorlib.Tensor):
+        return obj
+    elif isinstance(obj, np.ndarray):
+        pass
+    else:
+        obj = np.array(obj)
+    if len(obj.shape) != 2:
+        raise exceptions.AutoDiffException("Invalid object")
+    return obj.astype(np.float32)
+
+
+class CTensor(object):
+
+    def __init__(self, *args) -> None:
+
+        if len(args) == 2:
+            self.value = tensorlib.Tensor(*args)
+        elif len(args) == 1:
+            object = args[0]
+            if isinstance(object, tensorlib.Tensor):
+                self.value: tensorlib.Tensor = object
+            else:
+                self.value: tensorlib.Tensor = tensorlib.Tensor(object)
+
+    def __add__(self, other):
+        onCpu = onCPU(self.value, other.value)
+        if onCpu:
+            value = tensorlib.cpu_add(self.value, other.value)
+        else:
+            print("add called")
+            value = tensorlib.gpu_add(self.value, other.value)
+        return CTensor(value)
+
+    def __mul__(self, other):
+        onCpu = onCPU(self.value, other.value)
+        if onCpu:
+            value = tensorlib.cpu_mul(self.value, other.value)
+        else:
+            value = tensorlib.gpu_mul(self.value, other.value)
+        return CTensor(value)
+
+    def sum(self, axis: int = 0):
+        onCpu = self.onCPU()
+        if onCpu:
+            value = tensorlib.cpu_sum(self.value, axis)
+        else:
+            value = tensorlib.gpu_sum(self.value, axis)
+        return CTensor(value)
+
+    def broadcast(self, axis: int, dim: 0):
+        print("In CTensor")
+        onCpu = self.onCPU()
+        if onCpu:
+            value = tensorlib.cpu_bct(self.value, axis, dim)
+        else:
+            print("using gpu bct")
+            value = tensorlib.gpu_bct(self.value, axis, dim)
+        return CTensor(value)
+    
+    def set_zero(self):
+        if self.onCPU():
+            tensorlib.cpu_set_zero(self.value)
+        else:
+            tensorlib.gpu_set_zero(self.value)
+    
+    def __repr__(self) -> str:
+        return self.value.__repr__()
+    
+    def rows(self) -> int:
+        return self.value.rows()
+
+    def cols(self) -> int:
+        return self.value.cols()
+    
+    def onCPU(self) -> bool:
+        return self.value.onCPU()
+    
+    def cpu(self):
+        self.value.cpu()
+
+    def gpu(self):
+        self.value.gpu()
+
+    def gpuFree(self):
+        self.value.gpuFree()
+
+def onCPU(*tensors: CTensor) -> bool:
+    tOnCPU = tensors[0].onCPU()
+    for tensor in tensors:
+        assert tOnCPU == tensor.onCPU(), "Tensors are not on the same device"
+    return tOnCPU
