@@ -59,7 +59,8 @@ class Tensor {
 
     // cpp internal ops
     float *dataGpu() { return gpu_data; }
-    void _gpu();
+    void gpu_alloc();
+    void maintain();
     void setOnGpu(bool);
     size_t size() const { return dim0 * dim1 * sizeof(float); };
 

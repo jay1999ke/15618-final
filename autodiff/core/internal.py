@@ -36,7 +36,6 @@ class CTensor(object):
         if onCpu:
             value = tensorlib.cpu_add(self.value, other.value)
         else:
-            print("add called")
             value = tensorlib.gpu_add(self.value, other.value)
         return CTensor(value)
 
@@ -57,12 +56,10 @@ class CTensor(object):
         return CTensor(value)
 
     def broadcast(self, axis: int, dim: 0):
-        print("In CTensor")
         onCpu = self.onCPU()
         if onCpu:
             value = tensorlib.cpu_bct(self.value, axis, dim)
         else:
-            print("using gpu bct")
             value = tensorlib.gpu_bct(self.value, axis, dim)
         return CTensor(value)
     

@@ -93,10 +93,9 @@ class Tensor(object):
         return Sum(self, axis)
 
     def broadcast(self, axis: int, dim: 0):
-        print("in Tensor")
         return Broadcast(self, axis, dim)
 
-    def backward(self, gradient = None) -> None:
+    def backward(self, gradient=None) -> None:
         """Propagates appropriate gradient to 
         local reverse computational sub-graph"""
 
@@ -152,7 +151,6 @@ def _broadcast(a: Tensor, b: Tensor) -> Tuple[Tensor, Tensor]:
         if a.shape[0] == 1:
             a = a.broadcast(axis=0, dim=b.shape[0])
         elif b.shape[0] == 1:
-            print("in _broadcast")
             b = b.broadcast(axis=0, dim=a.shape[0])
         else:
             raise exceptions.ShapeMismatchException("Shapes don't match")
@@ -162,6 +160,12 @@ def _broadcast(a: Tensor, b: Tensor) -> Tuple[Tensor, Tensor]:
     elif b.shape == (1, 1):
         b = b.broadcast(axis=0, dim=a.shape[0])
         b = b.broadcast(axis=1, dim=a.shape[1])
+    elif a.shape[0] == 1: # potential broadcast (TODO: check correctness)
+        a = a.broadcast(axis=0, dim=b.shape[0])
+        a, b = _broadcast(a, b)
+    elif b.shape[0] == 1: # potential broadcast (TODO: check correctness)
+        b = b.broadcast(axis=0, dim=a.shape[0])
+        a, b = _broadcast(a, b)
     else:
         raise exceptions.ShapeMismatchException("Shapes don't match")
     return a, b
@@ -170,11 +174,8 @@ def _broadcast(a: Tensor, b: Tensor) -> Tuple[Tensor, Tensor]:
 class Add(Tensor):
 
     def __init__(self, a: Tensor, b: Tensor) -> None:
-        print(a.shape, b.shape)
         a, b = _broadcast(a, b)
-        print(a.shape, b.shape)
         value = a.value + b.value
-        print(value)
         super().__init__(value)
         self.requires_grad = a.requires_grad or b.requires_grad
 
@@ -187,7 +188,6 @@ class Add(Tensor):
             def vjp_b(gradient: Tensor) -> Tensor:
                 return gradient
             self.parents.append(GraphNode(tensor=b, vjp=vjp_b))
-        print("add complete")
 
 
 class Multiply(Tensor):
@@ -228,7 +228,6 @@ class Sum(Tensor):
 class Broadcast(Tensor):
 
     def __init__(self, a: Tensor, axis: int, dim: int) -> None:
-        print("In Broadcast")
         super().__init__(a.value.broadcast(axis=axis, dim=dim))
         self.requires_grad = a.requires_grad
 

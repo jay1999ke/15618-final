@@ -2,26 +2,37 @@
 
 Tensor *createGPUTensor(size_t rows, size_t cols) {
     Tensor *tensor = new Tensor(rows, cols);
-    tensor->_gpu();
+    tensor->gpu_alloc();
+    tensor->setOnGpu(true);
     return tensor;
 }
 
 void Tensor::setOnGpu(bool val) { on_gpu = val; }
 
-void Tensor::_gpu() {
+void Tensor::gpu_alloc() {
     if (gpu_data == nullptr)
         cudaMalloc(&gpu_data, size());
-    setOnGpu(true);
 }
 
 void Tensor::gpu() {
-    _gpu();
+    gpu_alloc();
     cudaMemcpy(dataGpu(), data(), size(), cudaMemcpyHostToDevice);
+    setOnGpu(true);
 }
 
 void Tensor::cpu() {
     if (dataGpu() != nullptr)
         cudaMemcpy(data(), dataGpu(), size(), cudaMemcpyDeviceToHost);
+}
+
+void Tensor::maintain() {
+    if (on_gpu) {
+        if (dataGpu() != nullptr)
+            cudaMemcpy(data(), dataGpu(), size(), cudaMemcpyDeviceToHost);
+    } else {
+        if (dataGpu() != nullptr)
+            cudaMemcpy(dataGpu(), data(), size(), cudaMemcpyHostToDevice);
+    }
 }
 
 void Tensor::gpuFree() {
@@ -31,9 +42,7 @@ void Tensor::gpuFree() {
     setOnGpu(false);
 }
 
-void gpu_set_zero(Tensor *a) {
-    cudaMemset(a->dataGpu(), 0, a->size());
-}
+void gpu_set_zero(Tensor *a) { cudaMemset(a->dataGpu(), 0, a->size()); }
 
 Tensor *gpu_add(Tensor *a, Tensor *b) {
     a->onGpuAssert();
@@ -61,7 +70,7 @@ Tensor *gpu_mul(Tensor *a, Tensor *b) {
     a->onGpuAssert();
     b->onGpuAssert();
     a->sameShapeAssert(b);
-    
+
     py::buffer_info a_info = a->request();
     py::buffer_info b_info = b->request();
 
