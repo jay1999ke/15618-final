@@ -5,6 +5,12 @@
 URL: <a href="https://15618-cuda-autodiff.netlify.app/" >15618-cuda-autodiff.netlify.app</a>
 
 
+<h3><a href="https://github.com/jay1999ke/15618.cuda-autodiff/raw/main/web/15618%20Final%20Project%20Milestone%20Report.pdf" type="application/pdf" target="_blank">Milestone Report</a> </h3>
+
+<h3><a href="https://github.com/jay1999ke/15618.cuda-autodiff/raw/main/web/15618%20Final%20Project%20Proposal.pdf" type="application/pdf" target="_blank">Project Proposal</a> </h3>
+
+### Proposal
+
 #### SUMMARY: 
 We are going to implement automatic differentiation on GPU (CUDA) and compare it with a CPU version and perform a detailed analysis of both systems’ performance characteristics. Automatic differentiation will be supported for first-order partial derivatives of functions that are commonly used in Deep Learning i.e addition, multiplication, transpose, power, matrix multiplication (a stretch goal is to also support 2D convolution).
 
