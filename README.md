@@ -5,9 +5,9 @@
 URL: <a href="https://15618-cuda-autodiff.netlify.app/" >15618-cuda-autodiff.netlify.app</a>
 
 
-<h3><a href="https://github.com/jay1999ke/15618.cuda-autodiff/raw/main/web/15618%20Final%20Project%20Milestone%20Report.pdf" type="application/pdf" target="_blank">Milestone Report</a> </h3>
+<h3><a href="web/15618%20Final%20Project%20Milestone%20Report.pdf" type="application/pdf" target="_blank">Milestone Report</a> </h3>
 
-<h3><a href="https://github.com/jay1999ke/15618.cuda-autodiff/raw/main/web/15618%20Final%20Project%20Proposal.pdf" type="application/pdf" target="_blank">Project Proposal</a> </h3>
+<h3><a href="web/15618%20Final%20Project%20Proposal.pdf" type="application/pdf" target="_blank">Project Proposal</a> </h3>
 
 ### Proposal
 
