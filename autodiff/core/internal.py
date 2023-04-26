@@ -81,6 +81,17 @@ class CTensor(object):
             value = tensorlib.gpu_cpy(self.value)
         return CTensor(value)
 
+    def t(self):
+        onCpu = self.onCPU()
+        if onCpu:
+            value = tensorlib.cpu_tsp(self.value)
+        else:
+            value = tensorlib.gpu_tsp(self.value)
+        return CTensor(value) 
+
+    def transpose(self):
+        return self.t()
+
     def exp(self):
         onCpu = self.onCPU()
         if onCpu:

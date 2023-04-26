@@ -61,3 +61,14 @@ __global__ void _exp(float *a, float *res, int dim0, int dim1) {
         res[idx] = exp(a[idx]);
     }
 }
+
+__global__ void _tsp(float *a, float *res, int dim0, int dim1) {
+    unsigned int idx = blockIdx.x * blockDim.x + threadIdx.x;
+
+    unsigned int i = idx % dim1;
+    unsigned int j = idx / dim1;
+
+    if (idx < dim0 * dim1) {
+        res[j + i * dim0] = a[idx];
+    }
+}

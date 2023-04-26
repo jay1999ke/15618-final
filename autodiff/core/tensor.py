@@ -102,6 +102,12 @@ class Tensor(object):
     def exp(self):
         return Exp(self)
 
+    def t(self):
+        return Transpose(self)
+    
+    def transpose(self):
+        return self.t()
+
     def broadcast(self, axis: int, dim: 0):
         return Broadcast(self, axis, dim)
 
@@ -256,4 +262,15 @@ class Exp(Tensor):
         if a.requires_grad:
             def vjp(gradient: Tensor) -> Tensor:
                 return Tensor(gradient.value * self.value)
+            self.parents.append(GraphNode(tensor=a, vjp=vjp))
+
+class Transpose(Tensor):
+
+    def __init__(self, a: Tensor) -> None:
+        super().__init__(a.value.t())
+        self.requires_grad = a.requires_grad
+
+        if a.requires_grad:
+            def vjp(gradient: Tensor) -> Tensor:
+                return Tensor(gradient.value.t())
             self.parents.append(GraphNode(tensor=a, vjp=vjp))
