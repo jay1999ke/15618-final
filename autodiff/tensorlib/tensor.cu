@@ -149,3 +149,19 @@ Tensor *gpu_bct(Tensor *a, int axis, int dim) {
 
     return result;
 }
+
+Tensor *gpu_cpy(Tensor *a) {
+    a->onGpuAssert();
+
+    py::buffer_info a_info = a->request();
+
+    int dim0 = a_info.shape[0];
+    int dim1 = a_info.shape[1];
+    size_t size = a->size();
+
+    Tensor *result = createGPUTensor(dim0, dim1);
+
+    cudaMemcpy(result->dataGpu(), a->dataGpu(), size, cudaMemcpyDeviceToDevice);
+
+    return result;
+}

@@ -94,6 +94,7 @@ Tensor *cpu_add(Tensor *a, Tensor *b);
 Tensor *cpu_mul(Tensor *a, Tensor *b);
 Tensor *cpu_sum(Tensor *a, int axis);
 Tensor *cpu_bct(Tensor *a, int axis, int dim);
+Tensor *cpu_cpy(Tensor *a);
 
 // gpu arith ops
 void gpu_set_zero(Tensor *a);
@@ -101,6 +102,7 @@ Tensor *gpu_add(Tensor *a, Tensor *b);
 Tensor *gpu_mul(Tensor *a, Tensor *b);
 Tensor *gpu_sum(Tensor *a, int axis);
 Tensor *gpu_bct(Tensor *a, int axis, int dim);
+Tensor *gpu_cpy(Tensor *a);
 
 // kernels
 __global__ void _add(float *a, float *b, float *res, int dim0, int dim1);

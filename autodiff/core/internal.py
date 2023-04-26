@@ -3,6 +3,7 @@ import numpy as np
 from autodiff import tensorlib
 from autodiff.core import exceptions
 
+
 def make_numpy(obj: any):
     t_type = type(obj)
     if t_type == int or t_type == float or t_type == bool:
@@ -62,25 +63,33 @@ class CTensor(object):
         else:
             value = tensorlib.gpu_bct(self.value, axis, dim)
         return CTensor(value)
-    
+
     def set_zero(self):
         if self.onCPU():
             tensorlib.cpu_set_zero(self.value)
         else:
             tensorlib.gpu_set_zero(self.value)
-    
+
     def __repr__(self) -> str:
         return self.value.__repr__()
-    
+
+    def copy(self):
+        onCpu = self.onCPU()
+        if onCpu:
+            value = tensorlib.cpu_cpy(self.value)
+        else:
+            value = tensorlib.gpu_cpy(self.value)
+        return CTensor(value)
+
     def rows(self) -> int:
         return self.value.rows()
 
     def cols(self) -> int:
         return self.value.cols()
-    
+
     def onCPU(self) -> bool:
         return self.value.onCPU()
-    
+
     def cpu(self):
         self.value.cpu()
 
@@ -89,6 +98,7 @@ class CTensor(object):
 
     def gpuFree(self):
         self.value.gpuFree()
+
 
 def onCPU(*tensors: CTensor) -> bool:
     tOnCPU = tensors[0].onCPU()
