@@ -50,4 +50,9 @@ PYBIND11_MODULE(tensorlib, m) {
           py::return_value_policy::take_ownership);
     m.def("gpu_cpy", [](Tensor *a) { return gpu_cpy(a); },
           py::return_value_policy::take_ownership);
+
+    m.def("cpu_exp", [](Tensor *a) { return cpu_exp(a); },
+          py::return_value_policy::take_ownership);
+    m.def("gpu_exp", [](Tensor *a) { return gpu_exp(a); },
+          py::return_value_policy::take_ownership);
 }

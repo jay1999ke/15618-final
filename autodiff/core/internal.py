@@ -81,6 +81,14 @@ class CTensor(object):
             value = tensorlib.gpu_cpy(self.value)
         return CTensor(value)
 
+    def exp(self):
+        onCpu = self.onCPU()
+        if onCpu:
+            value = tensorlib.cpu_exp(self.value)
+        else:
+            value = tensorlib.gpu_exp(self.value)
+        return CTensor(value)
+
     def rows(self) -> int:
         return self.value.rows()
 

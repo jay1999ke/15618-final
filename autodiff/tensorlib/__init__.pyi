@@ -9,12 +9,14 @@ __all__ = [
     "cpu_add",
     "cpu_bct",
     "cpu_cpy",
+    "cpu_exp",
     "cpu_mul",
     "cpu_set_zero",
     "cpu_sum",
     "gpu_add",
     "gpu_bct",
     "gpu_cpy",
+    "gpu_exp",
     "gpu_mul",
     "gpu_set_zero",
     "gpu_sum"
@@ -41,6 +43,8 @@ def cpu_bct(arg0: Tensor, arg1: int, arg2: int) -> Tensor:
     pass
 def cpu_cpy(arg0: Tensor) -> Tensor:
     pass
+def cpu_exp(arg0: Tensor) -> Tensor:
+    pass
 def cpu_mul(arg0: Tensor, arg1: Tensor) -> Tensor:
     pass
 def cpu_set_zero(arg0: Tensor) -> None:
@@ -52,6 +56,8 @@ def gpu_add(arg0: Tensor, arg1: Tensor) -> Tensor:
 def gpu_bct(arg0: Tensor, arg1: int, arg2: int) -> Tensor:
     pass
 def gpu_cpy(arg0: Tensor) -> Tensor:
+    pass
+def gpu_exp(arg0: Tensor) -> Tensor:
     pass
 def gpu_mul(arg0: Tensor, arg1: Tensor) -> Tensor:
     pass

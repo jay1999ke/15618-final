@@ -53,3 +53,11 @@ __global__ void _bct(float *a, float *res, int res_dim0, int res_dim1,
         }
     }
 }
+
+__global__ void _exp(float *a, float *res, int dim0, int dim1) {
+    unsigned int idx = blockIdx.x * blockDim.x + threadIdx.x;
+
+    if (idx < dim0 * dim1) {
+        res[idx] = exp(a[idx]);
+    }
+}

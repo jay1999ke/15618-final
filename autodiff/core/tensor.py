@@ -99,6 +99,9 @@ class Tensor(object):
     def sum(self, axis: int = 0):
         return Sum(self, axis)
 
+    def exp(self):
+        return Exp(self)
+
     def broadcast(self, axis: int, dim: 0):
         return Broadcast(self, axis, dim)
 
@@ -242,4 +245,15 @@ class Broadcast(Tensor):
             def vjp(gradient: Tensor) -> Tensor:
                 gradient = gradient.value.sum(axis=axis)
                 return Tensor(gradient)
+            self.parents.append(GraphNode(tensor=a, vjp=vjp))
+
+class Exp(Tensor):
+
+    def __init__(self, a: Tensor) -> None:
+        super().__init__(a.value.exp())
+        self.requires_grad = a.requires_grad
+
+        if a.requires_grad:
+            def vjp(gradient: Tensor) -> Tensor:
+                return Tensor(gradient.value * self.value)
             self.parents.append(GraphNode(tensor=a, vjp=vjp))
