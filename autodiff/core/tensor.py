@@ -68,6 +68,13 @@ class Tensor(object):
     def __repr__(self) -> str:
         return self.value.__repr__()
 
+    def copy(self, copy_grad: bool = False):
+        value = self.value.copy()
+        tensor = Tensor(value)
+        if copy_grad and self.grad:
+            tensor.grad = self.grad.copy()
+        return tensor
+
     def cpu(self):
         self.value.cpu()
         if self.grad:

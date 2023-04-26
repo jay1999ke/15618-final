@@ -164,3 +164,19 @@ Tensor *cpu_bct(Tensor *a, int axis, int dim) {
 
     return result;
 }
+
+Tensor *cpu_cpy(Tensor *a) {
+    a->onCpuAssert();
+
+    py::buffer_info a_info = a->request();
+
+    int dim0 = a_info.shape[0];
+    int dim1 = a_info.shape[1];
+    size_t size = a->size();
+
+    Tensor *result = new Tensor(dim0, dim1); // create an object on the heap
+
+    memcpy(result->data(), a->data(), size);
+
+    return result;
+}
