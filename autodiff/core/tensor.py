@@ -104,7 +104,13 @@ class Tensor(object):
 
     def t(self):
         return Transpose(self)
-    
+
+    def __pow__(self, val: float):
+        return Power(self, val)
+
+    def pow(self, val: float):
+        return Power(self, val)
+
     def transpose(self):
         return self.t()
 
@@ -176,10 +182,10 @@ def _broadcast(a: Tensor, b: Tensor) -> Tuple[Tensor, Tensor]:
     elif b.shape == (1, 1):
         b = b.broadcast(axis=0, dim=a.shape[0])
         b = b.broadcast(axis=1, dim=a.shape[1])
-    elif a.shape[0] == 1: # potential broadcast (TODO: check correctness)
+    elif a.shape[0] == 1:  # potential broadcast (TODO: check correctness)
         a = a.broadcast(axis=0, dim=b.shape[0])
         a, b = _broadcast(a, b)
-    elif b.shape[0] == 1: # potential broadcast (TODO: check correctness)
+    elif b.shape[0] == 1:  # potential broadcast (TODO: check correctness)
         b = b.broadcast(axis=0, dim=a.shape[0])
         a, b = _broadcast(a, b)
     else:
@@ -253,6 +259,7 @@ class Broadcast(Tensor):
                 return Tensor(gradient)
             self.parents.append(GraphNode(tensor=a, vjp=vjp))
 
+
 class Exp(Tensor):
 
     def __init__(self, a: Tensor) -> None:
@@ -264,6 +271,7 @@ class Exp(Tensor):
                 return Tensor(gradient.value * self.value)
             self.parents.append(GraphNode(tensor=a, vjp=vjp))
 
+
 class Transpose(Tensor):
 
     def __init__(self, a: Tensor) -> None:
@@ -273,4 +281,22 @@ class Transpose(Tensor):
         if a.requires_grad:
             def vjp(gradient: Tensor) -> Tensor:
                 return Tensor(gradient.value.t())
+            self.parents.append(GraphNode(tensor=a, vjp=vjp))
+
+
+class Power(Tensor):
+    # only int supported right now, TODO: Add tensor power
+    # all funcs using broadcast should have 2 modes: scaler and tensor
+
+    def __init__(self, a: Tensor, val: float) -> None:
+        super().__init__(a.value.pow(val))
+        self.requires_grad = a.requires_grad
+
+        if a.requires_grad:
+            def vjp(gradient: Tensor) -> Tensor:
+                onCpu = gradient.onCPU()
+                valTensor = Tensor(val)
+                if not onCpu:
+                    valTensor.gpu()
+                return Tensor(gradient.value * (a.value.pow(val - 1))) * valTensor
             self.parents.append(GraphNode(tensor=a, vjp=vjp))

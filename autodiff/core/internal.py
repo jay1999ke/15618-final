@@ -56,6 +56,14 @@ class CTensor(object):
             value = tensorlib.gpu_sum(self.value, axis)
         return CTensor(value)
 
+    def pow(self, val: float = 0):
+        onCpu = self.onCPU()
+        if onCpu:
+            value = tensorlib.cpu_pow(self.value, val)
+        else:
+            value = tensorlib.gpu_pow(self.value, val)
+        return CTensor(value)
+
     def broadcast(self, axis: int, dim: 0):
         onCpu = self.onCPU()
         if onCpu:

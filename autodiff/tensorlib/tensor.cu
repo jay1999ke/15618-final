@@ -180,7 +180,8 @@ Tensor *gpu_exp(Tensor *a) {
     const int threadsPerBlock = 512;
     int blocks = (result->size() + threadsPerBlock - 1) / threadsPerBlock;
 
-    _exp<<<blocks, threadsPerBlock>>>(a->dataGpu(), result->dataGpu(), dim0, dim1);
+    _exp<<<blocks, threadsPerBlock>>>(a->dataGpu(), result->dataGpu(), dim0,
+                                      dim1);
 
     return result;
 }
@@ -199,7 +200,28 @@ Tensor *gpu_tsp(Tensor *a) {
     const int threadsPerBlock = 512;
     int blocks = (result->size() + threadsPerBlock - 1) / threadsPerBlock;
 
-    _tsp<<<blocks, threadsPerBlock>>>(a->dataGpu(), result->dataGpu(), dim0, dim1);
+    _tsp<<<blocks, threadsPerBlock>>>(a->dataGpu(), result->dataGpu(), dim0,
+                                      dim1);
+
+    return result;
+}
+
+Tensor *gpu_pow(Tensor *a, float val) {
+    a->onGpuAssert();
+
+    py::buffer_info a_info = a->request();
+
+    int dim0 = a_info.shape[0];
+    int dim1 = a_info.shape[1];
+    size_t size = a->size();
+
+    Tensor *result = createGPUTensor(dim0, dim1);
+
+    const int threadsPerBlock = 512;
+    int blocks = (result->size() + threadsPerBlock - 1) / threadsPerBlock;
+
+    _pow<<<blocks, threadsPerBlock>>>(a->dataGpu(), result->dataGpu(), dim0,
+                                      dim1, val);
 
     return result;
 }

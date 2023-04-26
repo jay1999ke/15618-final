@@ -72,3 +72,11 @@ __global__ void _tsp(float *a, float *res, int dim0, int dim1) {
         res[j + i * dim0] = a[idx];
     }
 }
+
+__global__ void _pow(float *a, float *res, int dim0, int dim1, float val) {
+    unsigned int idx = blockIdx.x * blockDim.x + threadIdx.x;
+
+    if (idx < dim0 * dim1) {
+        res[idx] = pow(a[idx], val);
+    }
+}
