@@ -125,15 +125,19 @@ class Tensor(object):
             raise exceptions.AutoDiffException(
                 "Gradient called on a non-differentiable variable")
 
-        if not isinstance(gradient, Tensor):
-            raise exceptions.AutoDiffException(
-                "Gradient is not of type Tensor")
-
         if gradient is None:
             if self.shape == (1, 1):
                 gradient = Tensor(1)
+                if not self.onCPU():
+                    gradient.gpu()
             else:
                 raise exceptions.AutoDiffException("Gradient not provided")
+            
+        if not isinstance(gradient, Tensor):
+            raise exceptions.AutoDiffException(
+                "Gradient is not of type Tensor")
+        
+        assert gradient.shape == self.shape, "Gradient shape mismatch"
 
         assert gradient.requires_grad == False, "Recursion hell?"
 

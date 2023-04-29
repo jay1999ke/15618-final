@@ -49,24 +49,12 @@ z = z.sum(0).sum(1)
 print(pz,z)
 pz.backward()
 
-x = Tensor(1)
-x.gpu()
-z.backward(x)
-
-a.cpu()
-a.gpuFree()
-b.cpu()
-b.gpuFree()
-c.cpu()
-c.gpuFree()
-d.cpu()
-d.gpuFree()
-e.cpu()
-e.gpuFree()
+z.backward()
 
 ps = [pa,pb,pc,pd,pe]
 s = [a,b,c,d,e]
 
+# compare results: pytorch autograd vs autodiff
 for q,w in zip(ps, s):
     print(q.grad)
     print(w.grad)   
