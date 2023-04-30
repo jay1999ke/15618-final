@@ -246,3 +246,33 @@ Tensor *cpu_pow(Tensor *a, float val) {
 
     return result;
 }
+
+Tensor *cpu_matmul(Tensor *a, Tensor *b) {
+    a->onCpuAssert();
+    b->onCpuAssert();
+
+    if (a->cols() != b->rows())
+        throw std::runtime_error("Incompatible shape for matmul");
+
+    int m = a->rows();
+    int n = a->cols();
+    int k = b->cols();
+
+    Tensor *result = new Tensor(m, k); // create an object on the heap
+    float *res_ptr = result->data();
+
+    float *a_ptr = a->data();
+    float *b_ptr = b->data();
+
+    for (int i = 0; i < m; ++i) {
+        for (int j = 0; j < k; ++j) {
+            float dot_prod = 0;
+            for (int l = 0; l < n; ++l) {
+                dot_prod += a_ptr[i*n + l] * b_ptr[l*k + j];
+            }
+            res_ptr[i*k + j] = dot_prod;
+        }
+    }
+
+    return result;
+}

@@ -80,3 +80,20 @@ __global__ void _pow(float *a, float *res, int dim0, int dim1, float val) {
         res[idx] = pow(a[idx], val);
     }
 }
+
+__global__ void _matmul(float *a, float *b, float *res, int dim0_a, int dim1_a,
+                        int dim1_b) {
+    unsigned int idx = blockIdx.x * blockDim.x + threadIdx.x;
+
+    if (idx < dim0_a * dim1_b) {
+        int row = idx / dim1_b;
+        int col = idx % dim1_b;
+        float sum = 0.0;
+
+        for (int i = 0; i < dim1_a; i++) {
+            sum += a[row * dim1_a + i] * b[i * dim1_b + col];
+        }
+
+        res[idx] = sum;
+    }
+}

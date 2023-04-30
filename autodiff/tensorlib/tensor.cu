@@ -225,3 +225,26 @@ Tensor *gpu_pow(Tensor *a, float val) {
 
     return result;
 }
+
+Tensor *gpu_matmul(Tensor *a, Tensor *b) {
+    a->onGpuAssert();
+    b->onGpuAssert();
+
+    if (a->cols() != b->rows()) {
+        throw std::runtime_error("Incompatible shape for matmul");
+    }
+
+    int dim0_a = a->rows();
+    int dim1_a = a->cols();
+    int dim1_b = b->cols();
+
+    Tensor *result = createGPUTensor(dim0_a, dim1_b);
+
+    const int threadsPerBlock = 512;
+    int blocks = (result->size() + threadsPerBlock - 1) / threadsPerBlock;
+
+    _matmul<<<blocks, threadsPerBlock>>>(a->dataGpu(), b->dataGpu(), result->dataGpu(),
+                                          dim0_a, dim1_a, dim1_b);
+
+    return result;
+}

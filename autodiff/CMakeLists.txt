@@ -12,7 +12,7 @@ link_directories(
     /usr/local/cuda/lib64
     )
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O3")
 
 cuda_add_library(tensorlib SHARED 
   "tensorlib/tensor.h"

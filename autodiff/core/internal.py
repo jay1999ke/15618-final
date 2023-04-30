@@ -95,7 +95,15 @@ class CTensor(object):
             value = tensorlib.cpu_tsp(self.value)
         else:
             value = tensorlib.gpu_tsp(self.value)
-        return CTensor(value) 
+        return CTensor(value)
+
+    def matmul(self, other):
+        onCpu = onCPU(self.value, other.value)
+        if onCpu:
+            value = tensorlib.cpu_matmul(self.value, other.value)
+        else:
+            value = tensorlib.gpu_matmul(self.value, other.value)
+        return CTensor(value)
 
     def transpose(self):
         return self.t()

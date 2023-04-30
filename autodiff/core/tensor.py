@@ -102,6 +102,12 @@ class Tensor(object):
     def exp(self):
         return Exp(self)
 
+    def mm(self, other):
+        return MatMul(self, other)
+
+    def matmul(self, other):
+        return self.mm(other)
+
     def t(self):
         return Transpose(self)
 
@@ -132,11 +138,11 @@ class Tensor(object):
                     gradient.gpu()
             else:
                 raise exceptions.AutoDiffException("Gradient not provided")
-            
+
         if not isinstance(gradient, Tensor):
             raise exceptions.AutoDiffException(
                 "Gradient is not of type Tensor")
-        
+
         assert gradient.shape == self.shape, "Gradient shape mismatch"
 
         assert gradient.requires_grad == False, "Recursion hell?"
@@ -304,3 +310,20 @@ class Power(Tensor):
                     valTensor.gpu()
                 return Tensor(gradient.value * (a.value.pow(val - 1))) * valTensor
             self.parents.append(GraphNode(tensor=a, vjp=vjp))
+
+
+class MatMul(Tensor):
+
+    def __init__(self, a: Tensor, b: Tensor) -> None:
+        super().__init__(a.value.matmul(b.value))
+        self.requires_grad = a.requires_grad or b.requires_grad
+
+        if a.requires_grad:
+            def vjp_a(gradient: Tensor) -> Tensor:
+                return Tensor(gradient.value.matmul(b.value.transpose()))
+            self.parents.append(GraphNode(tensor=a, vjp=vjp_a))
+
+        if b.requires_grad:
+            def vjp_b(gradient: Tensor) -> Tensor:
+                return Tensor(a.value.transpose().matmul(gradient.value))
+            self.parents.append(GraphNode(tensor=b, vjp=vjp_b))
