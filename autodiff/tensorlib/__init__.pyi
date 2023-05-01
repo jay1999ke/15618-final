@@ -13,8 +13,10 @@ __all__ = [
     "cpu_exp",
     "cpu_matmul",
     "cpu_mul",
+    "cpu_neg",
     "cpu_pow",
     "cpu_set_zero",
+    "cpu_sub",
     "cpu_sum",
     "cpu_tsp",
     "gpu_add",
@@ -24,8 +26,10 @@ __all__ = [
     "gpu_exp",
     "gpu_matmul",
     "gpu_mul",
+    "gpu_neg",
     "gpu_pow",
     "gpu_set_zero",
+    "gpu_sub",
     "gpu_sum",
     "gpu_tsp"
 ]
@@ -59,9 +63,13 @@ def cpu_matmul(arg0: Tensor, arg1: Tensor) -> Tensor:
     pass
 def cpu_mul(arg0: Tensor, arg1: Tensor) -> Tensor:
     pass
+def cpu_neg(arg0: Tensor) -> Tensor:
+    pass
 def cpu_pow(arg0: Tensor, arg1: float) -> Tensor:
     pass
 def cpu_set_zero(arg0: Tensor) -> None:
+    pass
+def cpu_sub(arg0: Tensor, arg1: Tensor) -> Tensor:
     pass
 def cpu_sum(arg0: Tensor, arg1: int) -> Tensor:
     pass
@@ -81,9 +89,13 @@ def gpu_matmul(arg0: Tensor, arg1: Tensor) -> Tensor:
     pass
 def gpu_mul(arg0: Tensor, arg1: Tensor) -> Tensor:
     pass
+def gpu_neg(arg0: Tensor) -> Tensor:
+    pass
 def gpu_pow(arg0: Tensor, arg1: float) -> Tensor:
     pass
 def gpu_set_zero(arg0: Tensor) -> None:
+    pass
+def gpu_sub(arg0: Tensor, arg1: Tensor) -> Tensor:
     pass
 def gpu_sum(arg0: Tensor, arg1: int) -> Tensor:
     pass

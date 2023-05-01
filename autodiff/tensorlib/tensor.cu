@@ -66,6 +66,47 @@ Tensor *gpu_add(Tensor *a, Tensor *b) {
     return result;
 }
 
+Tensor *gpu_sub(Tensor *a, Tensor *b) {
+    a->onGpuAssert();
+    b->onGpuAssert();
+    a->sameShapeAssert(b);
+
+    py::buffer_info a_info = a->request();
+    py::buffer_info b_info = b->request();
+
+    int dim0 = a_info.shape[0];
+    int dim1 = a_info.shape[1];
+
+    Tensor *result = createGPUTensor(dim0, dim1);
+
+    const int threadsPerBlock = 512;
+    int blocks = (result->size() + threadsPerBlock - 1) / threadsPerBlock;
+
+    _sub<<<blocks, threadsPerBlock>>>(a->dataGpu(), b->dataGpu(),
+                                      result->dataGpu(), dim0, dim1);
+
+    return result;
+}
+
+Tensor *gpu_neg(Tensor *a) {
+    a->onGpuAssert();
+
+    py::buffer_info a_info = a->request();
+
+    int dim0 = a_info.shape[0];
+    int dim1 = a_info.shape[1];
+
+    Tensor *result = createGPUTensor(dim0, dim1);
+
+    const int threadsPerBlock = 512;
+    int blocks = (result->size() + threadsPerBlock - 1) / threadsPerBlock;
+
+    _neg<<<blocks, threadsPerBlock>>>(a->dataGpu(), result->dataGpu(), dim0,
+                                      dim1);
+
+    return result;
+}
+
 Tensor *gpu_mul(Tensor *a, Tensor *b) {
     a->onGpuAssert();
     b->onGpuAssert();
@@ -265,8 +306,8 @@ Tensor *gpu_matmul(Tensor *a, Tensor *b) {
     const int threadsPerBlock = 512;
     int blocks = (result->size() + threadsPerBlock - 1) / threadsPerBlock;
 
-    _matmul<<<blocks, threadsPerBlock>>>(a->dataGpu(), b->dataGpu(), result->dataGpu(),
-                                          dim0_a, dim1_a, dim1_b);
+    _matmul<<<blocks, threadsPerBlock>>>(
+        a->dataGpu(), b->dataGpu(), result->dataGpu(), dim0_a, dim1_a, dim1_b);
 
     return result;
 }

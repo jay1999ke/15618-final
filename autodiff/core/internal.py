@@ -40,6 +40,30 @@ class CTensor(object):
             value = tensorlib.gpu_add(self.value, other.value)
         return CTensor(value)
 
+    def __sub__(self, other):
+        onCpu = onCPU(self.value, other.value)
+        if onCpu:
+            value = tensorlib.cpu_sub(self.value, other.value)
+        else:
+            value = tensorlib.gpu_sub(self.value, other.value)
+        return CTensor(value)
+    
+    def __rsub__(self, other):
+        onCpu = onCPU(self.value, other.value)
+        if onCpu:
+            value = tensorlib.cpu_sub(other.value, self.value)
+        else:
+            value = tensorlib.gpu_sub(other.value, self.value)
+        return CTensor(value)
+    
+    def __neg__(self):
+        onCpu = self.onCPU()
+        if onCpu:
+            value = tensorlib.cpu_neg(self.value)
+        else:
+            value = tensorlib.gpu_neg(self.value)
+        return CTensor(value)
+
     def __mul__(self, other):
         onCpu = onCPU(self.value, other.value)
         if onCpu:

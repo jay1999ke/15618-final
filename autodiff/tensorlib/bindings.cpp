@@ -24,6 +24,16 @@ PYBIND11_MODULE(tensorlib, m) {
     m.def("gpu_add", [](Tensor *a, Tensor *b) { return gpu_add(a, b); },
           py::return_value_policy::take_ownership);
 
+    m.def("cpu_sub", [](Tensor *a, Tensor *b) { return cpu_sub(a, b); },
+          py::return_value_policy::take_ownership);
+    m.def("gpu_sub", [](Tensor *a, Tensor *b) { return gpu_sub(a, b); },
+          py::return_value_policy::take_ownership);
+
+    m.def("cpu_neg", [](Tensor *a) { return cpu_neg(a); },
+          py::return_value_policy::take_ownership);
+    m.def("gpu_neg", [](Tensor *a) { return gpu_neg(a); },
+          py::return_value_policy::take_ownership);
+
     m.def("cpu_mul", [](Tensor *a, Tensor *b) { return cpu_mul(a, b); },
           py::return_value_policy::take_ownership);
     m.def("gpu_mul", [](Tensor *a, Tensor *b) { return gpu_mul(a, b); },

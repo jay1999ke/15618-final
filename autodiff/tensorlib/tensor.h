@@ -92,6 +92,8 @@ Tensor *createGPUTensor(size_t rows, size_t cols);
 // cpu arith ops
 void cpu_set_zero(Tensor *a);
 Tensor *cpu_add(Tensor *a, Tensor *b);
+Tensor *cpu_sub(Tensor *a, Tensor *b);
+Tensor *cpu_neg(Tensor *a);
 Tensor *cpu_mul(Tensor *a, Tensor *b);
 Tensor *cpu_div(Tensor *a, Tensor *b);
 Tensor *cpu_sum(Tensor *a, int axis);
@@ -105,6 +107,8 @@ Tensor *cpu_matmul(Tensor *a, Tensor *b);
 // gpu arith ops
 void gpu_set_zero(Tensor *a);
 Tensor *gpu_add(Tensor *a, Tensor *b);
+Tensor *gpu_sub(Tensor *a, Tensor *b);
+Tensor *gpu_neg(Tensor *a);
 Tensor *gpu_mul(Tensor *a, Tensor *b);
 Tensor *gpu_div(Tensor *a, Tensor *b);
 Tensor *gpu_sum(Tensor *a, int axis);
@@ -117,6 +121,8 @@ Tensor *gpu_matmul(Tensor *a, Tensor *b);
 
 // kernels
 __global__ void _add(float *a, float *b, float *res, int dim0, int dim1);
+__global__ void _sub(float *a, float *b, float *res, int dim0, int dim1);
+__global__ void _neg(float *a, float *res, int dim0, int dim1);
 __global__ void _mul(float *a, float *b, float *res, int dim0, int dim1);
 __global__ void _div(float *a, float *b, float *res, int dim0, int dim1);
 __global__ void _sum(float *a, float *res, int dim0, int dim1, int axis);

@@ -93,6 +93,15 @@ class Tensor(object):
     def __add__(self, other):
         return Add(self, other)
 
+    def __sub__(self, other):
+        return Subtract(self, other)
+    
+    def __rsub__(self, other):
+        return Subtract(other, self)
+    
+    def __neg__(self):
+        return Negate(self)
+
     def __mul__(self, other):
         return Multiply(self, other)
 
@@ -228,6 +237,37 @@ class Add(Tensor):
             self.parents.append(GraphNode(tensor=b, vjp=vjp_b))
 
 
+class Subtract(Tensor):
+
+    def __init__(self, a: Tensor, b: Tensor) -> None:
+        a, b = _broadcast(a, b)
+        value = a.value - b.value
+        super().__init__(value)
+        self.requires_grad = a.requires_grad or b.requires_grad
+
+        if a.requires_grad:
+            def vjp_a(gradient: Tensor) -> Tensor:
+                return gradient
+            self.parents.append(GraphNode(tensor=a, vjp=vjp_a))
+
+        if b.requires_grad:
+            def vjp_b(gradient: Tensor) -> Tensor:
+                return -gradient
+            self.parents.append(GraphNode(tensor=b, vjp=vjp_b))
+
+
+class Negate(Tensor):
+
+    def __init__(self, a: Tensor) -> None:
+        super().__init__(-a.value)
+        self.requires_grad = a.requires_grad
+
+        if a.requires_grad:
+            def vjp_a(gradient: Tensor) -> Tensor:
+                return -gradient
+            self.parents.append(GraphNode(tensor=a, vjp=vjp_a))
+
+
 class Multiply(Tensor):
 
     def __init__(self, a: Tensor, b: Tensor) -> None:
@@ -245,6 +285,7 @@ class Multiply(Tensor):
             def vjp_b(gradient: Tensor) -> Tensor:
                 return Tensor(gradient.value * a.value)
             self.parents.append(GraphNode(tensor=b, vjp=vjp_b))
+
 
 class Divide(Tensor):
 
