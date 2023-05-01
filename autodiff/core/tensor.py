@@ -138,6 +138,12 @@ class Tensor(object):
     def broadcast(self, axis: int, dim: 0):
         return Broadcast(self, axis, dim)
 
+    def sigmoid(self):
+        return Sigmoid(self)
+    
+    def relu(self):
+        return Relu(self)
+
     def backward(self, gradient=None) -> None:
         """Propagates appropriate gradient to 
         local reverse computational sub-graph"""
@@ -396,3 +402,22 @@ class MatMul(Tensor):
             def vjp_b(gradient: Tensor) -> Tensor:
                 return Tensor(a.value.transpose().matmul(gradient.value))
             self.parents.append(GraphNode(tensor=b, vjp=vjp_b))
+
+def Sigmoid(a: Tensor):
+    exp = a.exp()
+    one = Tensor(1)
+    if not a.onCPU():
+        one.gpu()
+    return exp / (one + exp)
+
+
+class Relu(Tensor):
+
+    def __init__(self, a: Tensor) -> None:
+        super().__init__(a.value.relu())
+        self.requires_grad = a.requires_grad
+
+        if a.requires_grad:
+            def vjp(gradient: Tensor) -> Tensor:
+                return Tensor(a.value.relu_grad(gradient.value))
+            self.parents.append(GraphNode(tensor=a, vjp=vjp))

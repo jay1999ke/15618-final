@@ -25,9 +25,7 @@ std::string Tensor::repr() {
     return str;
 };
 
-void cpu_set_zero(Tensor *a) {
-    memset(a->data(), 0, a->size());
-}
+void cpu_set_zero(Tensor *a) { memset(a->data(), 0, a->size()); }
 
 Tensor *cpu_add(Tensor *a, Tensor *b) {
     a->onCpuAssert();
@@ -96,7 +94,7 @@ Tensor *cpu_neg(Tensor *a) {
 
     for (int i = 0; i < dim0; i++) {
         for (int j = 0; j < dim1; j++) {
-            res_ptr[i * dim1 + j] = - a_ptr[i * dim1 + j];
+            res_ptr[i * dim1 + j] = -a_ptr[i * dim1 + j];
         }
     }
 
@@ -321,6 +319,51 @@ Tensor *cpu_pow(Tensor *a, float val) {
     return result;
 }
 
+Tensor *cpu_relu(Tensor *a) {
+    a->onCpuAssert();
+
+    int dim0 = a->rows();
+    int dim1 = a->cols();
+    size_t size = a->size();
+
+    Tensor *result = new Tensor(dim0, dim1); // create an object on the heap
+    auto res_ptr = result->data();
+    auto a_ptr = a->data();
+
+    for (int i = 0; i < dim0; i++) {
+        for (int j = 0; j < dim1; j++) {
+            res_ptr[i * dim1 + j] =
+                a_ptr[i * dim1 + j] > 0 ? a_ptr[i * dim1 + j] : 0;
+        }
+    }
+
+    return result;
+}
+
+Tensor *cpu_relu_grad(Tensor *a, Tensor *grad) {
+    a->onCpuAssert();
+    grad->onCpuAssert();
+    a->sameShapeAssert(grad);
+
+    int dim0 = a->rows();
+    int dim1 = a->cols();
+    size_t size = a->size();
+
+    Tensor *result = new Tensor(dim0, dim1); // create an object on the heap
+    auto res_ptr = result->data();
+    auto a_ptr = a->data();
+    auto grad_ptr = grad->data();
+
+    for (int i = 0; i < dim0; i++) {
+        for (int j = 0; j < dim1; j++) {
+            res_ptr[i * dim1 + j] =
+                a_ptr[i * dim1 + j] > 0 ? grad_ptr[i * dim1 + j] : 0;
+        }
+    }
+
+    return result;
+}
+
 Tensor *cpu_matmul(Tensor *a, Tensor *b) {
     a->onCpuAssert();
     b->onCpuAssert();
@@ -342,9 +385,9 @@ Tensor *cpu_matmul(Tensor *a, Tensor *b) {
         for (int j = 0; j < k; ++j) {
             float dot_prod = 0;
             for (int l = 0; l < n; ++l) {
-                dot_prod += a_ptr[i*n + l] * b_ptr[l*k + j];
+                dot_prod += a_ptr[i * n + l] * b_ptr[l * k + j];
             }
-            res_ptr[i*k + j] = dot_prod;
+            res_ptr[i * k + j] = dot_prod;
         }
     }
 

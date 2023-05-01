@@ -289,6 +289,44 @@ Tensor *gpu_pow(Tensor *a, float val) {
     return result;
 }
 
+Tensor *gpu_relu(Tensor *a) {
+    a->onGpuAssert();
+
+    int dim0 = a->rows();
+    int dim1 = a->cols();
+    size_t size = a->size();
+
+    Tensor *result = createGPUTensor(dim0, dim1);
+
+    const int threadsPerBlock = 512;
+    int blocks = (result->size() + threadsPerBlock - 1) / threadsPerBlock;
+
+    _relu<<<blocks, threadsPerBlock>>>(a->dataGpu(), result->dataGpu(), dim0,
+                                       dim1);
+
+    return result;
+}
+
+Tensor *gpu_relu_grad(Tensor *a, Tensor *grad) {
+    a->onGpuAssert();
+    grad->onGpuAssert();
+    a->sameShapeAssert(grad);
+
+    int dim0 = a->rows();
+    int dim1 = a->cols();
+    size_t size = a->size();
+
+    Tensor *result = createGPUTensor(dim0, dim1);
+
+    const int threadsPerBlock = 512;
+    int blocks = (result->size() + threadsPerBlock - 1) / threadsPerBlock;
+
+    _relu_grad<<<blocks, threadsPerBlock>>>(a->dataGpu(), grad->dataGpu(),
+                                            result->dataGpu(), dim0, dim1);
+
+    return result;
+}
+
 Tensor *gpu_matmul(Tensor *a, Tensor *b) {
     a->onGpuAssert();
     b->onGpuAssert();

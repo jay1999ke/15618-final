@@ -81,6 +81,16 @@ PYBIND11_MODULE(tensorlib, m) {
     m.def("gpu_pow", [](Tensor *a, float val) { return gpu_pow(a, val); },
           py::return_value_policy::take_ownership);
 
+    m.def("cpu_relu", [](Tensor *a) { return cpu_relu(a); },
+          py::return_value_policy::take_ownership);
+    m.def("gpu_relu", [](Tensor *a) { return gpu_relu(a); },
+          py::return_value_policy::take_ownership);
+
+    m.def("cpu_relu_grad", [](Tensor *a, Tensor *grad) { return cpu_relu_grad(a, grad); },
+          py::return_value_policy::take_ownership);
+    m.def("gpu_relu_grad", [](Tensor *a, Tensor *grad) { return gpu_relu_grad(a, grad); },
+          py::return_value_policy::take_ownership);
+
     m.def("cpu_matmul", [](Tensor *a, Tensor *b) { return cpu_matmul(a, b); },
           py::return_value_policy::take_ownership);
     m.def("gpu_matmul", [](Tensor *a, Tensor *b) { return gpu_matmul(a, b); },

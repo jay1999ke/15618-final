@@ -102,6 +102,8 @@ Tensor *cpu_cpy(Tensor *a);
 Tensor *cpu_exp(Tensor *a);
 Tensor *cpu_tsp(Tensor *a);
 Tensor *cpu_pow(Tensor *a, float val);
+Tensor *cpu_relu(Tensor *a);
+Tensor *cpu_relu_grad(Tensor *a, Tensor *grad);
 Tensor *cpu_matmul(Tensor *a, Tensor *b);
 
 // gpu arith ops
@@ -117,6 +119,8 @@ Tensor *gpu_cpy(Tensor *a);
 Tensor *gpu_exp(Tensor *a);
 Tensor *gpu_tsp(Tensor *a);
 Tensor *gpu_pow(Tensor *a, float val);
+Tensor *gpu_relu(Tensor *a);
+Tensor *gpu_relu_grad(Tensor *a, Tensor *grad);
 Tensor *gpu_matmul(Tensor *a, Tensor *b);
 
 // kernels
@@ -131,5 +135,8 @@ __global__ void _bct(float *a, float *res, int res_dim0, int res_dim1,
 __global__ void _exp(float *a, float *res, int dim0, int dim1);
 __global__ void _tsp(float *a, float *res, int dim0, int dim1);
 __global__ void _pow(float *a, float *res, int dim0, int dim1, float val);
+__global__ void _relu(float *a, float *res, int dim0, int dim1);
+__global__ void _relu_grad(float *a, float *grad, float *res, int dim0,
+                           int dim1);
 __global__ void _matmul(float *a, float *b, float *res, int dim0_a, int dim1_a,
                         int dim1_b);
