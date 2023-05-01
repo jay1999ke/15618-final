@@ -48,6 +48,22 @@ class CTensor(object):
             value = tensorlib.gpu_mul(self.value, other.value)
         return CTensor(value)
 
+    def __truediv__(self, other):
+        onCpu = onCPU(self.value, other.value)
+        if onCpu:
+            value = tensorlib.cpu_div(self.value, other.value)
+        else:
+            value = tensorlib.gpu_div(self.value, other.value)
+        return CTensor(value)
+
+    def __rtruediv__(self, other):
+        onCpu = onCPU(self.value, other.value)
+        if onCpu:
+            value = tensorlib.cpu_div(other.value, self.value)
+        else:
+            value = tensorlib.gpu_div(other.value, self.value)
+        return CTensor(value)
+
     def sum(self, axis: int = 0):
         onCpu = self.onCPU()
         if onCpu:

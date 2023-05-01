@@ -96,6 +96,12 @@ class Tensor(object):
     def __mul__(self, other):
         return Multiply(self, other)
 
+    def __truediv__(self, other):
+        return Divide(self, other)
+
+    def __rtruediv__(self, other):
+        return Divide(other, self)
+
     def sum(self, axis: int = 0):
         return Sum(self, axis)
 
@@ -238,6 +244,28 @@ class Multiply(Tensor):
         if b.requires_grad:
             def vjp_b(gradient: Tensor) -> Tensor:
                 return Tensor(gradient.value * a.value)
+            self.parents.append(GraphNode(tensor=b, vjp=vjp_b))
+
+class Divide(Tensor):
+
+    def __init__(self, a: Tensor, b: Tensor) -> None:
+        a, b = _broadcast(a, b)
+        value = a.value / b.value
+        super().__init__(value)
+        self.requires_grad = a.requires_grad or b.requires_grad
+
+        if a.requires_grad:
+            def vjp_a(gradient: Tensor) -> Tensor:
+                return Tensor(gradient.value / b.value)
+            self.parents.append(GraphNode(tensor=a, vjp=vjp_a))
+
+        if b.requires_grad:
+            def vjp_b(gradient: Tensor) -> Tensor:
+                negative = Tensor(-1)
+                if not a.onCPU():
+                    negative.gpu()
+                part = negative * Tensor(a.value / b.value.pow(2))
+                return Tensor(gradient.value * part.value)
             self.parents.append(GraphNode(tensor=b, vjp=vjp_b))
 
 

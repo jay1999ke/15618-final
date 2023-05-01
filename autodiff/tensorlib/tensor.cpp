@@ -81,6 +81,32 @@ Tensor *cpu_mul(Tensor *a, Tensor *b) {
     return result;
 }
 
+Tensor *cpu_div(Tensor *a, Tensor *b) {
+    a->onCpuAssert();
+    b->onCpuAssert();
+    a->sameShapeAssert(b);
+
+    py::buffer_info a_info = a->request();
+    py::buffer_info b_info = b->request();
+
+    auto a_ptr = static_cast<float *>(a_info.ptr);
+    auto b_ptr = static_cast<float *>(b_info.ptr);
+
+    int dim0 = a_info.shape[0];
+    int dim1 = a_info.shape[1];
+
+    Tensor *result = new Tensor(dim0, dim1); // create an object on the heap
+    float *res_ptr = result->data();
+
+    for (int i = 0; i < dim0; i++) {
+        for (int j = 0; j < dim1; j++) {
+            res_ptr[i * dim1 + j] = a_ptr[i * dim1 + j] / b_ptr[i * dim1 + j];
+        }
+    }
+
+    return result;
+}
+
 Tensor *cpu_sum(Tensor *a, int axis) {
     a->onCpuAssert();
 
