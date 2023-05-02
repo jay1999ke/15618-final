@@ -50,7 +50,7 @@ class CTensor(object):
         else:
             value = tensorlib.gpu_sub(self.value, other.value)
         return CTensor(value)
-    
+
     def __rsub__(self, other):
         onCpu = onCPU(self.value, other.value)
         if onCpu:
@@ -58,7 +58,7 @@ class CTensor(object):
         else:
             value = tensorlib.gpu_sub(other.value, self.value)
         return CTensor(value)
-    
+
     def __neg__(self):
         onCpu = self.onCPU()
         if onCpu:
@@ -167,6 +167,21 @@ class CTensor(object):
             value = tensorlib.gpu_log(self.value)
         return CTensor(value)
 
+    def max(self, axis: int = 1):
+        if self.onCPU():
+            max, idx = tensorlib.cpu_max(self.value, axis)
+        else:
+            max, idx = tensorlib.gpu_max(self.value, axis)
+        return CTensor(max), CTensor(idx)
+
+    def axial_mask(self, idx, axis: int):
+        onCpu = onCPU(self.value, idx.value)
+        if onCpu:
+            value = tensorlib.cpu_axial_mask(self.value, idx.value, axis)
+        else:
+            value = tensorlib.gpu_axial_mask(self.value, idx.value, axis)
+        return CTensor(value)
+
     def relu(self):
         onCpu = self.onCPU()
         if onCpu:
@@ -174,7 +189,7 @@ class CTensor(object):
         else:
             value = tensorlib.gpu_relu(self.value)
         return CTensor(value)
-    
+
     def relu_grad(self, gradient):
         onCpu = self.onCPU()
         if onCpu:

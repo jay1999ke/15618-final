@@ -76,6 +76,66 @@ __global__ void _sum(float *a, float *res, int dim0, int dim1, int axis) {
     }
 }
 
+__global__ void _max(float *a, float *res, float *id, int dim0, int dim1,
+                     int axis) {
+    unsigned int idx = blockIdx.x * blockDim.x + threadIdx.x;
+
+    int res_dim0, res_dim1;
+    if (axis == 0) {
+        res_dim0 = 1;
+        res_dim1 = dim1;
+    } else {
+        res_dim0 = dim0;
+        res_dim1 = 1;
+    }
+
+    if (idx < res_dim0 * res_dim1) {
+        float temp_result;
+        float index = 0;
+        if (axis == 0) {
+            temp_result = a[idx];
+            for (int i = 0; i < dim0; i++) {
+                if (temp_result < a[i * dim1 + idx]) {
+                    temp_result = a[i * dim1 + idx];
+                    index = i;
+                }
+            }
+        } else {
+            temp_result = a[idx * dim1];
+            for (int j = 0; j < dim1; j++) {
+                if (temp_result < a[idx * dim1 + j]) {
+                    temp_result = a[idx * dim1 + j];
+                    index = j;
+                }
+            }
+        }
+        res[idx] = temp_result;
+        id[idx] = index;
+    }
+}
+
+__global__ void _axial_mask(float *res, float *id, int dim0, int dim1,
+                           int axis) {
+    unsigned int idx = blockIdx.x * blockDim.x + threadIdx.x;
+
+    int res_dim0, res_dim1;
+    if (axis == 0) {
+        res_dim0 = 1;
+        res_dim1 = dim1;
+    } else {
+        res_dim0 = dim0;
+        res_dim1 = 1;
+    }
+
+    if (idx < res_dim0 * res_dim1) {
+        if (axis == 0) {
+            res[(int)id[idx] * dim1 + idx] = 1.0;
+        } else {
+            res[(int)id[idx] + dim1 * idx] = 1.0;
+        }
+    }
+}
+
 __global__ void _bct(float *a, float *res, int res_dim0, int res_dim1,
                      int axis) {
     unsigned int idx = blockIdx.x * blockDim.x + threadIdx.x;

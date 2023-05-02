@@ -80,6 +80,7 @@ class Tensor(object):
 
     def cpu(self):
         self.value.cpu()
+        self.value.gpuFree()  # until this is fixed in tensorlib
         if self.grad:
             self.grad.cpu()
 
@@ -116,6 +117,9 @@ class Tensor(object):
 
     def sum(self, axis: int = 0):
         return Sum(self, axis)
+
+    def max(self, axis: int):
+        return Max(self, axis)
 
     def exp(self):
         return Exp(self)
@@ -173,7 +177,7 @@ class Tensor(object):
             raise exceptions.AutoDiffException(
                 "Gradient is not of type Tensor")
 
-        assert gradient.shape == self.shape, "Gradient shape mismatch"
+        assert gradient.shape == self.shape, f"Gradient shape mismatch: {gradient.shape}, {self.shape}"
 
         assert gradient.requires_grad == False, "Recursion hell?"
 
@@ -365,6 +369,7 @@ class Exp(Tensor):
                 return Tensor(gradient.value * self.value)
             self.parents.append(GraphNode(tensor=a, vjp=vjp))
 
+
 class Log(Tensor):
 
     def __init__(self, a: Tensor) -> None:
@@ -422,6 +427,22 @@ class MatMul(Tensor):
             def vjp_b(gradient: Tensor) -> Tensor:
                 return Tensor(a.value.transpose().matmul(gradient.value))
             self.parents.append(GraphNode(tensor=b, vjp=vjp_b))
+
+
+class Max(Tensor):
+
+    def __init__(self, a: Tensor, axis: int) -> None:
+        assert axis < 2, "Axis greater than 1"
+        maxT, idxT = a.value.max(axis)
+        super().__init__(maxT)
+        self.requires_grad = a.requires_grad
+
+        if a.requires_grad:
+            def vjp(gradient: Tensor) -> Tensor:
+                gradient, _ = _broadcast(gradient, a)
+                grad = gradient.value * a.value.axial_mask(idxT, axis)
+                return Tensor(grad)
+            self.parents.append(GraphNode(tensor=a, vjp=vjp))
 
 
 def Sigmoid(a: Tensor) -> Tensor:

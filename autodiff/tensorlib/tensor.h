@@ -116,6 +116,8 @@ Tensor *cpu_pow(Tensor *a, float val);
 Tensor *cpu_relu(Tensor *a);
 Tensor *cpu_relu_grad(Tensor *a, Tensor *grad);
 Tensor *cpu_matmul(Tensor *a, Tensor *b);
+std::vector<Tensor *> cpu_max(Tensor *a, int axis);
+Tensor *cpu_axial_mask(Tensor *a, Tensor *idx, int axis);
 
 // gpu arith ops
 void gpu_set_zero(Tensor *a);
@@ -134,6 +136,8 @@ Tensor *gpu_pow(Tensor *a, float val);
 Tensor *gpu_relu(Tensor *a);
 Tensor *gpu_relu_grad(Tensor *a, Tensor *grad);
 Tensor *gpu_matmul(Tensor *a, Tensor *b);
+std::vector<Tensor *> gpu_max(Tensor *a, int axis);
+Tensor *gpu_axial_mask(Tensor *a, Tensor *idx, int axis);
 
 // kernels
 __global__ void _add(float *a, float *b, float *res, int dim0, int dim1);
@@ -153,3 +157,7 @@ __global__ void _relu_grad(float *a, float *grad, float *res, int dim0,
                            int dim1);
 __global__ void _matmul(float *a, float *b, float *res, int dim0_a, int dim1_a,
                         int dim1_b);
+__global__ void _axial_mask(float *res, float *id, int dim0, int dim1,
+                           int axis);
+__global__ void _max(float *a, float *res, float *id, int dim0, int dim1,
+                     int axis);

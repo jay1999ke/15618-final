@@ -50,6 +50,22 @@ PYBIND11_MODULE(tensorlib, m) {
     m.def("gpu_sum", [](Tensor *a, int axis) { return gpu_sum(a, axis); },
           py::return_value_policy::take_ownership);
 
+    m.def("cpu_max", [](Tensor *a, int axis) { return cpu_max(a, axis); },
+          py::return_value_policy::take_ownership);
+    m.def("gpu_max", [](Tensor *a, int axis) { return gpu_max(a, axis); },
+          py::return_value_policy::take_ownership);
+
+    m.def("cpu_axial_mask",
+          [](Tensor *a, Tensor *idx, int axis) {
+              return cpu_axial_mask(a, idx, axis);
+          },
+          py::return_value_policy::take_ownership);
+    m.def("gpu_axial_mask",
+          [](Tensor *a, Tensor *idx, int axis) {
+              return gpu_axial_mask(a, idx, axis);
+          },
+          py::return_value_policy::take_ownership);
+
     m.def("cpu_bct",
           [](Tensor *a, int axis, int dim) { return cpu_bct(a, axis, dim); },
           py::return_value_policy::take_ownership);
@@ -92,9 +108,11 @@ PYBIND11_MODULE(tensorlib, m) {
     m.def("gpu_relu", [](Tensor *a) { return gpu_relu(a); },
           py::return_value_policy::take_ownership);
 
-    m.def("cpu_relu_grad", [](Tensor *a, Tensor *grad) { return cpu_relu_grad(a, grad); },
+    m.def("cpu_relu_grad",
+          [](Tensor *a, Tensor *grad) { return cpu_relu_grad(a, grad); },
           py::return_value_policy::take_ownership);
-    m.def("gpu_relu_grad", [](Tensor *a, Tensor *grad) { return gpu_relu_grad(a, grad); },
+    m.def("gpu_relu_grad",
+          [](Tensor *a, Tensor *grad) { return gpu_relu_grad(a, grad); },
           py::return_value_policy::take_ownership);
 
     m.def("cpu_matmul", [](Tensor *a, Tensor *b) { return cpu_matmul(a, b); },

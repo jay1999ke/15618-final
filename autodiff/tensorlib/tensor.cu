@@ -369,3 +369,56 @@ Tensor *gpu_matmul(Tensor *a, Tensor *b) {
 
     return result;
 }
+
+std::vector<Tensor *> gpu_max(Tensor *a, int axis) {
+    a->onGpuAssert();
+
+    int dim0 = a->rows();
+    int dim1 = a->cols();
+
+    int res_dim0, res_dim1;
+
+    if (axis == 0) {
+        res_dim0 = 1;
+        res_dim1 = dim1;
+    } else if (axis == 1) {
+        res_dim0 = dim0;
+        res_dim1 = 1;
+    } else {
+        throw std::runtime_error("Invalid max axis");
+    }
+
+    Tensor *max = createGPUTensor(res_dim0, res_dim1);
+    Tensor *idx = createGPUTensor(res_dim0, res_dim1);
+
+    const int threadsPerBlock = 512;
+    int blocks = (max->size() + threadsPerBlock - 1) / threadsPerBlock;
+
+    _max<<<blocks, threadsPerBlock>>>(a->dataGpu(), max->dataGpu(),
+                                      idx->dataGpu(), dim0, dim1, axis);
+
+    std::vector<Tensor *> result;
+    result.push_back(max);
+    result.push_back(idx);
+
+    return result;
+}
+
+Tensor *gpu_axial_mask(Tensor *a, Tensor *idx, int axis) {
+    a->onGpuAssert();
+
+    int dim0 = a->rows();
+    int dim1 = a->cols();
+
+    Tensor *result = createGPUTensor(dim0, dim1);
+
+    const int threadsPerBlock = 512;
+    int blocks = (idx->size() + threadsPerBlock - 1) / threadsPerBlock;
+
+    cudaMemset(result->dataGpu(), 0, result->size());
+
+    _axial_mask<<<blocks, threadsPerBlock>>>(result->dataGpu(), idx->dataGpu(),
+                                             dim0, dim1, axis);
+
+    return result;
+}

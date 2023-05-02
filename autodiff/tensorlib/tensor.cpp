@@ -415,3 +415,87 @@ Tensor *cpu_matmul(Tensor *a, Tensor *b) {
 
     return result;
 }
+
+std::vector<Tensor *> cpu_max(Tensor *a, int axis) {
+    a->onCpuAssert();
+
+    auto a_ptr = a->data();
+
+    int dim0 = a->rows();
+    int dim1 = a->cols();
+
+    int res_dim0, res_dim1;
+
+    if (axis == 0) {
+        res_dim0 = 1;
+        res_dim1 = dim1;
+    } else if (axis == 1) {
+        res_dim0 = dim0;
+        res_dim1 = 1;
+    } else {
+        throw std::runtime_error("Invalid max axis");
+    }
+
+    Tensor *max = new Tensor(res_dim0, res_dim1);
+    float *max_ptr = max->data();
+
+    Tensor *idx = new Tensor(res_dim0, res_dim1);
+    float *idx_ptr = idx->data();
+
+    if (axis == 0) {
+        for (int j = 0; j < dim1; j++) {
+            float temp = a_ptr[j];
+            float max_idx = 0.0;
+            for (int i = 0; i < dim0; i++) {
+                if (temp < a_ptr[i * dim1 + j]) {
+                    temp = a_ptr[i * dim1 + j];
+                    max_idx = i;
+                }
+            }
+            max_ptr[j] = temp;
+            idx_ptr[j] = max_idx;
+        }
+    } else {
+        for (int i = 0; i < dim0; i++) {
+            float temp = a_ptr[i * dim1];
+            float max_idx = 0.0;
+            for (int j = 0; j < dim1; j++) {
+                if (temp < a_ptr[i * dim1 + j]) {
+                    temp = a_ptr[i * dim1 + j];
+                    max_idx = j;
+                }
+            }
+            max_ptr[i] = temp;
+            idx_ptr[i] = max_idx;
+        }
+    }
+
+    std::vector<Tensor *> result;
+    result.push_back(max);
+    result.push_back(idx);
+
+    return result;
+}
+
+Tensor *cpu_axial_mask(Tensor *a, Tensor *idx, int axis) {
+    a->onCpuAssert();
+
+    int dim0 = a->rows();
+    int dim1 = a->cols();
+
+    Tensor *result = new Tensor(dim0, dim1, true);
+
+    auto idx_ptr = idx->data();
+    auto res_ptr = result->data();
+
+    if (axis == 0) {
+        for (int j = 0; j < dim1; j++) {
+            res_ptr[(int) idx_ptr[j] * dim1 + j] = 1.0;
+        }
+    } else {
+        for (int i = 0; i < dim0; i++) {
+            res_ptr[i * dim1 + (int) idx_ptr[i]] = 1.0;
+        }
+    }
+    return result;
+}

@@ -7,12 +7,14 @@ _Shape = typing.Tuple[int, ...]
 __all__ = [
     "Tensor",
     "cpu_add",
+    "cpu_axial_mask",
     "cpu_bct",
     "cpu_cpy",
     "cpu_div",
     "cpu_exp",
     "cpu_log",
     "cpu_matmul",
+    "cpu_max",
     "cpu_mul",
     "cpu_neg",
     "cpu_pow",
@@ -23,12 +25,14 @@ __all__ = [
     "cpu_sum",
     "cpu_tsp",
     "gpu_add",
+    "gpu_axial_mask",
     "gpu_bct",
     "gpu_cpy",
     "gpu_div",
     "gpu_exp",
     "gpu_log",
     "gpu_matmul",
+    "gpu_max",
     "gpu_mul",
     "gpu_neg",
     "gpu_pow",
@@ -58,6 +62,8 @@ class Tensor():
     pass
 def cpu_add(arg0: Tensor, arg1: Tensor) -> Tensor:
     pass
+def cpu_axial_mask(arg0: Tensor, arg1: Tensor, arg2: int) -> Tensor:
+    pass
 def cpu_bct(arg0: Tensor, arg1: int, arg2: int) -> Tensor:
     pass
 def cpu_cpy(arg0: Tensor) -> Tensor:
@@ -69,6 +75,8 @@ def cpu_exp(arg0: Tensor) -> Tensor:
 def cpu_log(arg0: Tensor) -> Tensor:
     pass
 def cpu_matmul(arg0: Tensor, arg1: Tensor) -> Tensor:
+    pass
+def cpu_max(arg0: Tensor, arg1: int) -> typing.List[Tensor]:
     pass
 def cpu_mul(arg0: Tensor, arg1: Tensor) -> Tensor:
     pass
@@ -90,6 +98,8 @@ def cpu_tsp(arg0: Tensor) -> Tensor:
     pass
 def gpu_add(arg0: Tensor, arg1: Tensor) -> Tensor:
     pass
+def gpu_axial_mask(arg0: Tensor, arg1: Tensor, arg2: int) -> Tensor:
+    pass
 def gpu_bct(arg0: Tensor, arg1: int, arg2: int) -> Tensor:
     pass
 def gpu_cpy(arg0: Tensor) -> Tensor:
@@ -101,6 +111,8 @@ def gpu_exp(arg0: Tensor) -> Tensor:
 def gpu_log(arg0: Tensor) -> Tensor:
     pass
 def gpu_matmul(arg0: Tensor, arg1: Tensor) -> Tensor:
+    pass
+def gpu_max(arg0: Tensor, arg1: int) -> typing.List[Tensor]:
     pass
 def gpu_mul(arg0: Tensor, arg1: Tensor) -> Tensor:
     pass
