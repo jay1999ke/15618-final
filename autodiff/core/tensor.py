@@ -75,6 +75,9 @@ class Tensor(object):
             tensor.grad = self.grad.copy()
         return tensor
 
+    def numpy(self):
+        return self.value.numpy()
+
     def cpu(self):
         self.value.cpu()
         if self.grad:

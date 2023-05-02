@@ -57,6 +57,16 @@ class Tensor {
             data(), sizeof(float), py::format_descriptor<float>::format(), 2,
             {rows(), cols()}, {sizeof(float) * cols(), sizeof(float)});
     };
+    py::array_t<float> numpy() {
+        onCpuAssert();
+        auto info = py::buffer_info( // make a copy
+            nullptr, sizeof(float), py::format_descriptor<float>::format(), 2,
+            {rows(), cols()}, {sizeof(float) * cols(), sizeof(float)});
+        auto result = py::array(info);
+        auto res_ptr = static_cast<float *>(result.request().ptr);
+        memcpy(res_ptr, cpu_data, size());
+        return result;
+    }
 
     // cpp internal ops
     float *dataGpu() { return gpu_data; }

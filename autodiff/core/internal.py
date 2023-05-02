@@ -32,6 +32,9 @@ class CTensor(object):
             else:
                 self.value: tensorlib.Tensor = tensorlib.Tensor(object)
 
+    def numpy(self):
+        return self.value.numpy()
+
     def __add__(self, other):
         onCpu = onCPU(self.value, other.value)
         if onCpu:

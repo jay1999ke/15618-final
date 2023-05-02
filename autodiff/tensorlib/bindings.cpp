@@ -13,6 +13,7 @@ PYBIND11_MODULE(tensorlib, m) {
         .def("data", &Tensor::data)
         .def("rows", &Tensor::rows)
         .def("cols", &Tensor::cols)
+        .def("numpy", &Tensor::numpy, py::return_value_policy::take_ownership)
         .def("__repr__", &Tensor::repr)
         .def("cpu", &Tensor::cpu)
         .def("gpu", &Tensor::gpu)
