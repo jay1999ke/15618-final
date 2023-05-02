@@ -275,6 +275,28 @@ Tensor *cpu_exp(Tensor *a) {
     return result;
 }
 
+Tensor *cpu_log(Tensor *a) {
+    a->onCpuAssert();
+
+    py::buffer_info a_info = a->request();
+
+    int dim0 = a_info.shape[0];
+    int dim1 = a_info.shape[1];
+    size_t size = a->size();
+
+    Tensor *result = new Tensor(dim0, dim1); // create an object on the heap
+    auto res_ptr = result->data();
+    auto a_ptr = a->data();
+
+    for (int i = 0; i < dim0; i++) {
+        for (int j = 0; j < dim1; j++) {
+            res_ptr[i * dim1 + j] = std::log(a_ptr[i * dim1 + j]);
+        }
+    }
+
+    return result;
+}
+
 Tensor *cpu_tsp(Tensor *a) {
     a->onCpuAssert();
 

@@ -97,6 +97,14 @@ __global__ void _exp(float *a, float *res, int dim0, int dim1) {
     }
 }
 
+__global__ void _log(float *a, float *res, int dim0, int dim1) {
+    unsigned int idx = blockIdx.x * blockDim.x + threadIdx.x;
+
+    if (idx < dim0 * dim1) {
+        res[idx] = log(a[idx]);
+    }
+}
+
 __global__ void _tsp(float *a, float *res, int dim0, int dim1) {
     unsigned int idx = blockIdx.x * blockDim.x + threadIdx.x;
 

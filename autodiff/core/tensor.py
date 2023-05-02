@@ -120,6 +120,9 @@ class Tensor(object):
     def exp(self):
         return Exp(self)
 
+    def log(self):
+        return Log(self)
+
     def mm(self, other):
         return MatMul(self, other)
 
@@ -360,6 +363,17 @@ class Exp(Tensor):
         if a.requires_grad:
             def vjp(gradient: Tensor) -> Tensor:
                 return Tensor(gradient.value * self.value)
+            self.parents.append(GraphNode(tensor=a, vjp=vjp))
+
+class Log(Tensor):
+
+    def __init__(self, a: Tensor) -> None:
+        super().__init__(a.value.log())
+        self.requires_grad = a.requires_grad
+
+        if a.requires_grad:
+            def vjp(gradient: Tensor) -> Tensor:
+                return Tensor(gradient.value / a.value)
             self.parents.append(GraphNode(tensor=a, vjp=vjp))
 
 

@@ -11,6 +11,7 @@ __all__ = [
     "cpu_cpy",
     "cpu_div",
     "cpu_exp",
+    "cpu_log",
     "cpu_matmul",
     "cpu_mul",
     "cpu_neg",
@@ -26,6 +27,7 @@ __all__ = [
     "gpu_cpy",
     "gpu_div",
     "gpu_exp",
+    "gpu_log",
     "gpu_matmul",
     "gpu_mul",
     "gpu_neg",
@@ -50,6 +52,7 @@ class Tensor():
     def data(self) -> float: ...
     def gpu(self) -> None: ...
     def gpuFree(self) -> None: ...
+    def numpy(self) -> numpy.ndarray[numpy.float32]: ...
     def onCPU(self) -> bool: ...
     def rows(self) -> int: ...
     pass
@@ -62,6 +65,8 @@ def cpu_cpy(arg0: Tensor) -> Tensor:
 def cpu_div(arg0: Tensor, arg1: Tensor) -> Tensor:
     pass
 def cpu_exp(arg0: Tensor) -> Tensor:
+    pass
+def cpu_log(arg0: Tensor) -> Tensor:
     pass
 def cpu_matmul(arg0: Tensor, arg1: Tensor) -> Tensor:
     pass
@@ -92,6 +97,8 @@ def gpu_cpy(arg0: Tensor) -> Tensor:
 def gpu_div(arg0: Tensor, arg1: Tensor) -> Tensor:
     pass
 def gpu_exp(arg0: Tensor) -> Tensor:
+    pass
+def gpu_log(arg0: Tensor) -> Tensor:
     pass
 def gpu_matmul(arg0: Tensor, arg1: Tensor) -> Tensor:
     pass

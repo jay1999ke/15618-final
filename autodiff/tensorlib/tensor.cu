@@ -249,6 +249,26 @@ Tensor *gpu_exp(Tensor *a) {
     return result;
 }
 
+Tensor *gpu_log(Tensor *a) {
+    a->onGpuAssert();
+
+    py::buffer_info a_info = a->request();
+
+    int dim0 = a_info.shape[0];
+    int dim1 = a_info.shape[1];
+    size_t size = a->size();
+
+    Tensor *result = createGPUTensor(dim0, dim1);
+
+    const int threadsPerBlock = 512;
+    int blocks = (result->size() + threadsPerBlock - 1) / threadsPerBlock;
+
+    _log<<<blocks, threadsPerBlock>>>(a->dataGpu(), result->dataGpu(), dim0,
+                                      dim1);
+
+    return result;
+}
+
 Tensor *gpu_tsp(Tensor *a) {
     a->onGpuAssert();
 

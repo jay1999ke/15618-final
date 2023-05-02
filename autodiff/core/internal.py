@@ -159,6 +159,14 @@ class CTensor(object):
             value = tensorlib.gpu_exp(self.value)
         return CTensor(value)
 
+    def log(self):
+        onCpu = self.onCPU()
+        if onCpu:
+            value = tensorlib.cpu_log(self.value)
+        else:
+            value = tensorlib.gpu_log(self.value)
+        return CTensor(value)
+
     def relu(self):
         onCpu = self.onCPU()
         if onCpu:
