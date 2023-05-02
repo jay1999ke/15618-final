@@ -41,9 +41,9 @@ e = Tensor(ne)
 e.requires_grad = True
 e.gpu()
 
-pz = (pa + pb) * (pa*pb) + pc + pd + (pc*pd) + pe + (pc*pd)
+pz = (pa + pb) * (pa*pb) + pc + pd + (pc*pd) + pe + (pc/pd) + (pc - pd) * (-pe)
 pz = pz.sum(0, keepdim=True).sum(1, keepdim=True)
-z = (a + b) * (a*b) + c + d + (c*d) + e + (c*d)
+z = (a + b) * (a*b) + c + d + (c*d) + e + (c/d) + (c - d) * (-e)
 z = z.sum(0).sum(1)
 
 print(pz,z)
