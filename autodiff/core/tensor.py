@@ -95,10 +95,10 @@ class Tensor(object):
 
     def __sub__(self, other):
         return Subtract(self, other)
-    
+
     def __rsub__(self, other):
         return Subtract(other, self)
-    
+
     def __neg__(self):
         return Negate(self)
 
@@ -140,9 +140,12 @@ class Tensor(object):
 
     def sigmoid(self):
         return Sigmoid(self)
-    
+
     def relu(self):
         return Relu(self)
+
+    def mean(self, axis: int = -1):
+        return Mean(self, axis=axis)
 
     def backward(self, gradient=None) -> None:
         """Propagates appropriate gradient to 
@@ -403,7 +406,8 @@ class MatMul(Tensor):
                 return Tensor(a.value.transpose().matmul(gradient.value))
             self.parents.append(GraphNode(tensor=b, vjp=vjp_b))
 
-def Sigmoid(a: Tensor):
+
+def Sigmoid(a: Tensor) -> Tensor:
     exp = a.exp()
     one = Tensor(1)
     if not a.onCPU():
@@ -421,3 +425,25 @@ class Relu(Tensor):
             def vjp(gradient: Tensor) -> Tensor:
                 return Tensor(a.value.relu_grad(gradient.value))
             self.parents.append(GraphNode(tensor=a, vjp=vjp))
+
+
+def Mean(a: Tensor, axis: int = -1) -> Tensor:
+    assert axis in [0, 1, -1], "Invalid axis"
+    if axis == 0:
+        length = Tensor(a.shape[0])
+        a = a.sum(axis=axis)
+        if not a.onCPU():
+            length.gpu()
+        return a / length
+    elif axis == 1:
+        length = Tensor(a.shape[1])
+        a = a.sum(axis=axis)
+        if not a.onCPU():
+            length.gpu()
+        return a / length
+    else:
+        length = Tensor(a.shape[0] * a.shape[1])
+        a = a.sum(0).sum(1)
+        if not a.onCPU():
+            length.gpu()
+        return a / length
