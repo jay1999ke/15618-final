@@ -154,6 +154,9 @@ class Tensor(object):
     def relu(self):
         return Relu(self)
 
+    def log_softmax(self, axis: int):
+        return LogSoftmax(self, axis)
+
     def mean(self, axis: int = -1):
         return Mean(self, axis=axis)
 
@@ -485,3 +488,8 @@ def Mean(a: Tensor, axis: int = -1) -> Tensor:
         if not a.onCPU():
             length.gpu()
         return a / length
+
+
+def LogSoftmax(a: Tensor, axis: int):
+    a_off: Tensor = a - a.max(axis)
+    return a_off - (a_off.exp().sum(axis)).log()
