@@ -1,5 +1,4 @@
 import numpy as np
-from torch import zero_
 
 import autodiff.functional as F
 from autodiff.core.tensor import Tensor
