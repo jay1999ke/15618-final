@@ -11,6 +11,8 @@ class Optimizer(object):
     def step(self, loss: Tensor):
         self.update_weights(loss.parents)
         self.iteration += 1
+        if self.iteration % 10000 == 0:
+            self.learning_rate *= 0.91
 
     def update_weights(self, parents: List[GraphNode]):
         if parents:

@@ -41,20 +41,20 @@ if __name__ == "__main__":
     X.gpu()
     y.gpu()
 
-    layer1 = Linear(400, 25)
+    layer1 = Linear(400, 32)
     layer1.bias.gpu()
     layer1.weight.gpu()
-    layer2 = Linear(25, 25)
+    layer2 = Linear(32, 16)
     layer2.bias.gpu()
     layer2.weight.gpu()
-    layer3 = Linear(25, 10)
+    layer3 = Linear(16, 10)
     layer3.bias.gpu()
     layer3.weight.gpu()
 
     lr = 5e-2
     optim = Optimizer(learning_rate=lr)
 
-    for x in range(20000):
+    for x in range(100000):
 
         l1 = layer1(X).relu()
         l2 = layer2(l1).relu()
@@ -66,3 +66,4 @@ if __name__ == "__main__":
         
         if x % 50 == 0:
             print(x, get_accuracy_value(l3, np_y), loss)
+
