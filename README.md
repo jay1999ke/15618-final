@@ -2,6 +2,8 @@
 <h2 align="center">Jay Patel (japatel) and Tanvi Karandikar (tkarandi)</h2>
 <h3 align="center">URL: <a href="https://15618-cuda-autodiff.netlify.app/" >15618-cuda-autodiff.netlify.app</a></h3>
 
+<h3> Final Report URL: <a href="web/15618%20Final%20Project%20Report.pdf" type="application/pdf" target="_blank">Milestone Report.pdf</a> </h3>
+
 <h3> Milestone Report URL: <a href="web/15618%20Final%20Project%20Milestone%20Report.pdf" type="application/pdf" target="_blank">Milestone Report.pdf</a> </h3>
 
 <h3> Project Proposal URL: <a href="web/15618%20Final%20Project%20Proposal.pdf" type="application/pdf" target="_blank">Project Proposal.pdf</a> </h3>
