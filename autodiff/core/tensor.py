@@ -44,12 +44,8 @@ class Tensor(object):
         if val:
             self._requires_grad = True
             if not self.grad:
-                self.grad: Tensor = Tensor(
-                    CTensor(*self.shape), requires_grad=False
-                )
-                if not self.value.onCPU():
-                    self.grad.gpu()  # move grad to gpu is value is on gpu
-                self.zero_grad()
+                self.grad: Tensor = self.copy()
+                self.grad.value.set_zero()
         else:
             self.grad: Tensor = None
 
