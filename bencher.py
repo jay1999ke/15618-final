@@ -15,12 +15,13 @@ for j in range(len(rows)):
     r = rows[j]
     c = cols[j]
 
-    na = np.random.random((r,c))
-    nb = np.random.random((r,c))
-
 
     for i in range(len(ops)):
         
+        na = np.random.random((r,c))
+        nb = np.random.random((r,c))
+
+       
         a = Tensor(na)
         #a.requires_grad = True 
         b = Tensor(nb)
