@@ -1,5 +1,5 @@
 #include "tensor.h"
-#define THREADSPERBLOCK 512
+#define THREADSPERBLOCK 256
 
 Tensor *createGPUTensor(size_t rows, size_t cols) {
     Tensor *tensor = new Tensor(rows, cols);
