@@ -448,6 +448,10 @@ class Max(Tensor):
             self.parents.append(GraphNode(tensor=a, vjp=vjp))
 
 
+def Copy(a: Tensor) -> Tensor:
+    value = a.value.copy()
+    return Tensor(value)
+
 def Sigmoid(a: Tensor) -> Tensor:
     exp = a.exp()
     one = Tensor(1)

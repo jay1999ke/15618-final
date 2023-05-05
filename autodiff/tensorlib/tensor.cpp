@@ -1,4 +1,5 @@
 #include "tensor.h"
+#include <omp.h>
 
 std::string Tensor::repr() {
     if (on_gpu)
@@ -44,7 +45,9 @@ Tensor *cpu_add(Tensor *a, Tensor *b) {
     Tensor *result = new Tensor(dim0, dim1); // create an object on the heap
     float *res_ptr = result->data();
 
+    #pragma omp parallel for
     for (int i = 0; i < dim0; i++) {
+        #pragma omp parallel for
         for (int j = 0; j < dim1; j++) {
             res_ptr[i * dim1 + j] = a_ptr[i * dim1 + j] + b_ptr[i * dim1 + j];
         }
@@ -69,8 +72,10 @@ Tensor *cpu_sub(Tensor *a, Tensor *b) {
 
     Tensor *result = new Tensor(dim0, dim1); // create an object on the heap
     float *res_ptr = result->data();
-
+    
+    #pragma omp parallel for
     for (int i = 0; i < dim0; i++) {
+        #pragma omp parallel for
         for (int j = 0; j < dim1; j++) {
             res_ptr[i * dim1 + j] = a_ptr[i * dim1 + j] - b_ptr[i * dim1 + j];
         }
@@ -92,7 +97,9 @@ Tensor *cpu_neg(Tensor *a) {
     Tensor *result = new Tensor(dim0, dim1); // create an object on the heap
     float *res_ptr = result->data();
 
+    #pragma omp parallel for
     for (int i = 0; i < dim0; i++) {
+        #pragma omp parallel for
         for (int j = 0; j < dim1; j++) {
             res_ptr[i * dim1 + j] = -a_ptr[i * dim1 + j];
         }
@@ -118,7 +125,9 @@ Tensor *cpu_mul(Tensor *a, Tensor *b) {
     Tensor *result = new Tensor(dim0, dim1); // create an object on the heap
     float *res_ptr = result->data();
 
+    #pragma omp parallel for
     for (int i = 0; i < dim0; i++) {
+        #pragma omp parallel for
         for (int j = 0; j < dim1; j++) {
             res_ptr[i * dim1 + j] = a_ptr[i * dim1 + j] * b_ptr[i * dim1 + j];
         }
@@ -144,7 +153,9 @@ Tensor *cpu_div(Tensor *a, Tensor *b) {
     Tensor *result = new Tensor(dim0, dim1); // create an object on the heap
     float *res_ptr = result->data();
 
+    #pragma omp parallel for
     for (int i = 0; i < dim0; i++) {
+        #pragma omp parallel for
         for (int j = 0; j < dim1; j++) {
             res_ptr[i * dim1 + j] = a_ptr[i * dim1 + j] / b_ptr[i * dim1 + j];
         }
@@ -179,13 +190,17 @@ Tensor *cpu_sum(Tensor *a, int axis) {
     float *res_ptr = result->data();
 
     if (axis == 0) {
+        #pragma omp parallel for
         for (int i = 0; i < dim0; i++) {
+            #pragma omp parallel for
             for (int j = 0; j < dim1; j++) {
                 res_ptr[j] += a_ptr[i * dim1 + j];
             }
         }
     } else {
+        #pragma omp parallel for
         for (int i = 0; i < dim0; i++) {
+            #pragma omp parallel for
             for (int j = 0; j < dim1; j++) {
                 res_ptr[i] += a_ptr[i * dim1 + j];
             }
@@ -221,13 +236,17 @@ Tensor *cpu_bct(Tensor *a, int axis, int dim) {
     float *res_ptr = result->data();
 
     if (axis == 0) {
+        #pragma omp parallel for
         for (int i = 0; i < res_dim0; i++) {
+            #pragma omp parallel for
             for (int j = 0; j < res_dim1; j++) {
                 res_ptr[i * res_dim1 + j] = a_ptr[j];
             }
         }
     } else {
+        #pragma omp parallel for
         for (int i = 0; i < res_dim0; i++) {
+            #pragma omp parallel for
             for (int j = 0; j < res_dim1; j++) {
                 res_ptr[i * res_dim1 + j] = a_ptr[i];
             }
@@ -266,7 +285,9 @@ Tensor *cpu_exp(Tensor *a) {
     auto res_ptr = result->data();
     auto a_ptr = a->data();
 
+    #pragma omp parallel for
     for (int i = 0; i < dim0; i++) {
+        #pragma omp parallel for
         for (int j = 0; j < dim1; j++) {
             res_ptr[i * dim1 + j] = std::exp(a_ptr[i * dim1 + j]);
         }
@@ -288,7 +309,9 @@ Tensor *cpu_log(Tensor *a) {
     auto res_ptr = result->data();
     auto a_ptr = a->data();
 
+    #pragma omp parallel for
     for (int i = 0; i < dim0; i++) {
+        #pragma omp parallel for
         for (int j = 0; j < dim1; j++) {
             res_ptr[i * dim1 + j] = std::log(a_ptr[i * dim1 + j]);
         }
@@ -310,7 +333,9 @@ Tensor *cpu_tsp(Tensor *a) {
     auto res_ptr = result->data();
     auto a_ptr = a->data();
 
+    #pragma omp parallel for
     for (int i = 0; i < dim0; i++) {
+        #pragma omp parallel for
         for (int j = 0; j < dim1; j++) {
             res_ptr[j * dim0 + i] = a_ptr[i * dim1 + j];
         }
@@ -332,7 +357,9 @@ Tensor *cpu_pow(Tensor *a, float val) {
     auto res_ptr = result->data();
     auto a_ptr = a->data();
 
+    #pragma omp parallel for
     for (int i = 0; i < dim0; i++) {
+        #pragma omp parallel for
         for (int j = 0; j < dim1; j++) {
             res_ptr[i * dim1 + j] = std::pow(a_ptr[i * dim1 + j], val);
         }
@@ -352,7 +379,9 @@ Tensor *cpu_relu(Tensor *a) {
     auto res_ptr = result->data();
     auto a_ptr = a->data();
 
+    #pragma omp parallel for
     for (int i = 0; i < dim0; i++) {
+        #pragma omp parallel for
         for (int j = 0; j < dim1; j++) {
             res_ptr[i * dim1 + j] =
                 a_ptr[i * dim1 + j] > 0 ? a_ptr[i * dim1 + j] : 0;
@@ -376,7 +405,9 @@ Tensor *cpu_relu_grad(Tensor *a, Tensor *grad) {
     auto a_ptr = a->data();
     auto grad_ptr = grad->data();
 
+    #pragma omp parallel for
     for (int i = 0; i < dim0; i++) {
+        #pragma omp parallel for
         for (int j = 0; j < dim1; j++) {
             res_ptr[i * dim1 + j] =
                 a_ptr[i * dim1 + j] > 0 ? grad_ptr[i * dim1 + j] : 0;
@@ -403,7 +434,9 @@ Tensor *cpu_matmul(Tensor *a, Tensor *b) {
     float *a_ptr = a->data();
     float *b_ptr = b->data();
 
+    #pragma omp parallel for
     for (int i = 0; i < m; ++i) {
+        #pragma omp parallel for
         for (int j = 0; j < k; ++j) {
             float dot_prod = 0;
             for (int l = 0; l < n; ++l) {
@@ -443,6 +476,7 @@ std::vector<Tensor *> cpu_max(Tensor *a, int axis) {
     float *idx_ptr = idx->data();
 
     if (axis == 0) {
+        #pragma omp parallel for
         for (int j = 0; j < dim1; j++) {
             float temp = a_ptr[j];
             float max_idx = 0.0;
@@ -456,6 +490,7 @@ std::vector<Tensor *> cpu_max(Tensor *a, int axis) {
             idx_ptr[j] = max_idx;
         }
     } else {
+        #pragma omp parallel for
         for (int i = 0; i < dim0; i++) {
             float temp = a_ptr[i * dim1];
             float max_idx = 0.0;
@@ -489,10 +524,12 @@ Tensor *cpu_axial_mask(Tensor *a, Tensor *idx, int axis) {
     auto res_ptr = result->data();
 
     if (axis == 0) {
+        #pragma omp parallel for
         for (int j = 0; j < dim1; j++) {
             res_ptr[(int) idx_ptr[j] * dim1 + j] = 1.0;
         }
     } else {
+        #pragma omp parallel for
         for (int i = 0; i < dim0; i++) {
             res_ptr[i * dim1 + (int) idx_ptr[i]] = 1.0;
         }

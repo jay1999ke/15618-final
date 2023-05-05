@@ -2,24 +2,28 @@
 from autodiff.functional import *
 import numpy as np
 import time
+import sys
 
-numiter = 10
+numiter = 1000
 warmup = 100
 
 rows = [2, 4, 8, 64, 128, 256, 512, 1024, 2048, 4096, 8192]
 cols = [2, 4, 8, 64, 128, 256, 512, 1024, 2048, 4096, 8192]
-ops = [Add]    
+ops = [Add, Subtract, Multiply, Divide]    
+lbl = ["Add", "Subtract", "Multiply", "Divide"]    
 
 for j in range(len(rows)):
 
-    r = rows[j]
-    c = cols[j]
+    row = rows[j]
+    col = cols[j]
 
+    np.random.seed(0)
 
-    for i in range(len(ops)):
+    for kk in range(len(ops)):
         
-        na = np.random.random((r,c))
-        nb = np.random.random((r,c))
+
+        na = np.random.random((row,col))
+        nb = np.random.random((row,col))
 
        
         a = Tensor(na)
@@ -28,7 +32,7 @@ for j in range(len(rows)):
         #b.requires_grad = True
 
        
-        op = ops[i]
+        op = ops[kk]
         a.gpu()
         b.gpu()
     
@@ -57,9 +61,5 @@ for j in range(len(rows)):
             t3 = time.time()
             time_cpu += t3 - t2
 
-        #print("Time on cpu:", time_cpu/numiter)
-        #print("Time on gpu:", time_gpu/numiter)
-        print("Speedup: ", time_cpu/time_gpu)
-        #print("Gpu faster than cpu?", time_cpu > time_gpu)
-
-
+        
+        print(lbl[kk], row, col, time_cpu, time_gpu, numiter, warmup, sys.argv[1])

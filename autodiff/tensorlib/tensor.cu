@@ -1,4 +1,5 @@
 #include "tensor.h"
+#define THREADSPERBLOCK 512
 
 Tensor *createGPUTensor(size_t rows, size_t cols) {
     Tensor *tensor = new Tensor(rows, cols);
@@ -57,10 +58,10 @@ Tensor *gpu_add(Tensor *a, Tensor *b) {
 
     Tensor *result = createGPUTensor(dim0, dim1);
 
-    const int threadsPerBlock = 512;
-    int blocks = (result->size() + threadsPerBlock - 1) / threadsPerBlock;
+    
+    int blocks = (result->size() + THREADSPERBLOCK - 1) / THREADSPERBLOCK;
 
-    _add<<<blocks, threadsPerBlock>>>(a->dataGpu(), b->dataGpu(),
+    _add<<<blocks, THREADSPERBLOCK>>>(a->dataGpu(), b->dataGpu(),
                                       result->dataGpu(), dim0, dim1);
 
     return result;
@@ -79,10 +80,10 @@ Tensor *gpu_sub(Tensor *a, Tensor *b) {
 
     Tensor *result = createGPUTensor(dim0, dim1);
 
-    const int threadsPerBlock = 512;
-    int blocks = (result->size() + threadsPerBlock - 1) / threadsPerBlock;
+    
+    int blocks = (result->size() + THREADSPERBLOCK - 1) / THREADSPERBLOCK;
 
-    _sub<<<blocks, threadsPerBlock>>>(a->dataGpu(), b->dataGpu(),
+    _sub<<<blocks, THREADSPERBLOCK>>>(a->dataGpu(), b->dataGpu(),
                                       result->dataGpu(), dim0, dim1);
 
     return result;
@@ -98,10 +99,10 @@ Tensor *gpu_neg(Tensor *a) {
 
     Tensor *result = createGPUTensor(dim0, dim1);
 
-    const int threadsPerBlock = 512;
-    int blocks = (result->size() + threadsPerBlock - 1) / threadsPerBlock;
+    
+    int blocks = (result->size() + THREADSPERBLOCK - 1) / THREADSPERBLOCK;
 
-    _neg<<<blocks, threadsPerBlock>>>(a->dataGpu(), result->dataGpu(), dim0,
+    _neg<<<blocks, THREADSPERBLOCK>>>(a->dataGpu(), result->dataGpu(), dim0,
                                       dim1);
 
     return result;
@@ -120,10 +121,10 @@ Tensor *gpu_mul(Tensor *a, Tensor *b) {
 
     Tensor *result = createGPUTensor(dim0, dim1);
 
-    const int threadsPerBlock = 512;
-    int blocks = (result->size() + threadsPerBlock - 1) / threadsPerBlock;
+    
+    int blocks = (result->size() + THREADSPERBLOCK - 1) / THREADSPERBLOCK;
 
-    _mul<<<blocks, threadsPerBlock>>>(a->dataGpu(), b->dataGpu(),
+    _mul<<<blocks, THREADSPERBLOCK>>>(a->dataGpu(), b->dataGpu(),
                                       result->dataGpu(), dim0, dim1);
 
     return result;
@@ -142,10 +143,10 @@ Tensor *gpu_div(Tensor *a, Tensor *b) {
 
     Tensor *result = createGPUTensor(dim0, dim1);
 
-    const int threadsPerBlock = 512;
-    int blocks = (result->size() + threadsPerBlock - 1) / threadsPerBlock;
+    
+    int blocks = (result->size() + THREADSPERBLOCK - 1) / THREADSPERBLOCK;
 
-    _div<<<blocks, threadsPerBlock>>>(a->dataGpu(), b->dataGpu(),
+    _div<<<blocks, THREADSPERBLOCK>>>(a->dataGpu(), b->dataGpu(),
                                       result->dataGpu(), dim0, dim1);
 
     return result;
@@ -173,10 +174,10 @@ Tensor *gpu_sum(Tensor *a, int axis) {
 
     Tensor *result = createGPUTensor(res_dim0, res_dim1);
 
-    const int threadsPerBlock = 512;
-    int blocks = (result->size() + threadsPerBlock - 1) / threadsPerBlock;
+    
+    int blocks = (result->size() + THREADSPERBLOCK - 1) / THREADSPERBLOCK;
 
-    _sum<<<blocks, threadsPerBlock>>>(a->dataGpu(), result->dataGpu(), dim0,
+    _sum<<<blocks, THREADSPERBLOCK>>>(a->dataGpu(), result->dataGpu(), dim0,
                                       dim1, axis);
 
     return result;
@@ -204,10 +205,10 @@ Tensor *gpu_bct(Tensor *a, int axis, int dim) {
 
     Tensor *result = createGPUTensor(res_dim0, res_dim1);
 
-    const int threadsPerBlock = 512;
-    int blocks = (result->size() + threadsPerBlock - 1) / threadsPerBlock;
+    
+    int blocks = (result->size() + THREADSPERBLOCK - 1) / THREADSPERBLOCK;
 
-    _bct<<<blocks, threadsPerBlock>>>(a->dataGpu(), result->dataGpu(), res_dim0,
+    _bct<<<blocks, THREADSPERBLOCK>>>(a->dataGpu(), result->dataGpu(), res_dim0,
                                       res_dim1, axis);
 
     return result;
@@ -240,10 +241,10 @@ Tensor *gpu_exp(Tensor *a) {
 
     Tensor *result = createGPUTensor(dim0, dim1);
 
-    const int threadsPerBlock = 512;
-    int blocks = (result->size() + threadsPerBlock - 1) / threadsPerBlock;
+    
+    int blocks = (result->size() + THREADSPERBLOCK - 1) / THREADSPERBLOCK;
 
-    _exp<<<blocks, threadsPerBlock>>>(a->dataGpu(), result->dataGpu(), dim0,
+    _exp<<<blocks, THREADSPERBLOCK>>>(a->dataGpu(), result->dataGpu(), dim0,
                                       dim1);
 
     return result;
@@ -260,10 +261,10 @@ Tensor *gpu_log(Tensor *a) {
 
     Tensor *result = createGPUTensor(dim0, dim1);
 
-    const int threadsPerBlock = 512;
-    int blocks = (result->size() + threadsPerBlock - 1) / threadsPerBlock;
+    
+    int blocks = (result->size() + THREADSPERBLOCK - 1) / THREADSPERBLOCK;
 
-    _log<<<blocks, threadsPerBlock>>>(a->dataGpu(), result->dataGpu(), dim0,
+    _log<<<blocks, THREADSPERBLOCK>>>(a->dataGpu(), result->dataGpu(), dim0,
                                       dim1);
 
     return result;
@@ -280,10 +281,10 @@ Tensor *gpu_tsp(Tensor *a) {
 
     Tensor *result = createGPUTensor(dim1, dim0);
 
-    const int threadsPerBlock = 512;
-    int blocks = (result->size() + threadsPerBlock - 1) / threadsPerBlock;
+    
+    int blocks = (result->size() + THREADSPERBLOCK - 1) / THREADSPERBLOCK;
 
-    _tsp<<<blocks, threadsPerBlock>>>(a->dataGpu(), result->dataGpu(), dim0,
+    _tsp<<<blocks, THREADSPERBLOCK>>>(a->dataGpu(), result->dataGpu(), dim0,
                                       dim1);
 
     return result;
@@ -300,10 +301,10 @@ Tensor *gpu_pow(Tensor *a, float val) {
 
     Tensor *result = createGPUTensor(dim0, dim1);
 
-    const int threadsPerBlock = 512;
-    int blocks = (result->size() + threadsPerBlock - 1) / threadsPerBlock;
+    
+    int blocks = (result->size() + THREADSPERBLOCK - 1) / THREADSPERBLOCK;
 
-    _pow<<<blocks, threadsPerBlock>>>(a->dataGpu(), result->dataGpu(), dim0,
+    _pow<<<blocks, THREADSPERBLOCK>>>(a->dataGpu(), result->dataGpu(), dim0,
                                       dim1, val);
 
     return result;
@@ -318,10 +319,10 @@ Tensor *gpu_relu(Tensor *a) {
 
     Tensor *result = createGPUTensor(dim0, dim1);
 
-    const int threadsPerBlock = 512;
-    int blocks = (result->size() + threadsPerBlock - 1) / threadsPerBlock;
+    
+    int blocks = (result->size() + THREADSPERBLOCK - 1) / THREADSPERBLOCK;
 
-    _relu<<<blocks, threadsPerBlock>>>(a->dataGpu(), result->dataGpu(), dim0,
+    _relu<<<blocks, THREADSPERBLOCK>>>(a->dataGpu(), result->dataGpu(), dim0,
                                        dim1);
 
     return result;
@@ -338,10 +339,10 @@ Tensor *gpu_relu_grad(Tensor *a, Tensor *grad) {
 
     Tensor *result = createGPUTensor(dim0, dim1);
 
-    const int threadsPerBlock = 512;
-    int blocks = (result->size() + threadsPerBlock - 1) / threadsPerBlock;
+    
+    int blocks = (result->size() + THREADSPERBLOCK - 1) / THREADSPERBLOCK;
 
-    _relu_grad<<<blocks, threadsPerBlock>>>(a->dataGpu(), grad->dataGpu(),
+    _relu_grad<<<blocks, THREADSPERBLOCK>>>(a->dataGpu(), grad->dataGpu(),
                                             result->dataGpu(), dim0, dim1);
 
     return result;
@@ -361,10 +362,10 @@ Tensor *gpu_matmul(Tensor *a, Tensor *b) {
 
     Tensor *result = createGPUTensor(dim0_a, dim1_b);
 
-    const int threadsPerBlock = 512;
-    int blocks = (result->size() + threadsPerBlock - 1) / threadsPerBlock;
+    
+    int blocks = (result->size() + THREADSPERBLOCK - 1) / THREADSPERBLOCK;
 
-    _matmul<<<blocks, threadsPerBlock>>>(
+    _matmul<<<blocks, THREADSPERBLOCK>>>(
         a->dataGpu(), b->dataGpu(), result->dataGpu(), dim0_a, dim1_a, dim1_b);
 
     return result;
@@ -391,10 +392,10 @@ std::vector<Tensor *> gpu_max(Tensor *a, int axis) {
     Tensor *max = createGPUTensor(res_dim0, res_dim1);
     Tensor *idx = createGPUTensor(res_dim0, res_dim1);
 
-    const int threadsPerBlock = 512;
-    int blocks = (max->size() + threadsPerBlock - 1) / threadsPerBlock;
+    
+    int blocks = (max->size() + THREADSPERBLOCK - 1) / THREADSPERBLOCK;
 
-    _max<<<blocks, threadsPerBlock>>>(a->dataGpu(), max->dataGpu(),
+    _max<<<blocks, THREADSPERBLOCK>>>(a->dataGpu(), max->dataGpu(),
                                       idx->dataGpu(), dim0, dim1, axis);
 
     std::vector<Tensor *> result;
@@ -412,12 +413,12 @@ Tensor *gpu_axial_mask(Tensor *a, Tensor *idx, int axis) {
 
     Tensor *result = createGPUTensor(dim0, dim1);
 
-    const int threadsPerBlock = 512;
-    int blocks = (idx->size() + threadsPerBlock - 1) / threadsPerBlock;
+    
+    int blocks = (idx->size() + THREADSPERBLOCK - 1) / THREADSPERBLOCK;
 
     cudaMemset(result->dataGpu(), 0, result->size());
 
-    _axial_mask<<<blocks, threadsPerBlock>>>(result->dataGpu(), idx->dataGpu(),
+    _axial_mask<<<blocks, THREADSPERBLOCK>>>(result->dataGpu(), idx->dataGpu(),
                                              dim0, dim1, axis);
 
     return result;
