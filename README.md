@@ -1,8 +1,9 @@
 <h1 align="center">Automatic Differentiation Using CUDA - 15618</h1>
 <h2 align="center">Jay Patel (japatel) and Tanvi Karandikar (tkarandi)</h2>
 <h3 align="center">URL: <a href="https://15618-cuda-autodiff.netlify.app/" >15618-cuda-autodiff.netlify.app</a></h3>
+<h3 align="center">Code: <a href="https://github.com/jay1999ke/15618.cuda-autodiff" >github.com/jay1999ke/15618.cuda-autodiff</a></h3>
 
-<h3> Final Report URL: <a href="web/15618%20Final%20Project%20Report.pdf" type="application/pdf" target="_blank">Milestone Report.pdf</a> </h3>
+<h3> Final Report URL: <a href="web/15618%20Final%20Project%20Report.pdf" type="application/pdf" target="_blank">Final Report.pdf</a> </h3>
 
 <h3> Milestone Report URL: <a href="web/15618%20Final%20Project%20Milestone%20Report.pdf" type="application/pdf" target="_blank">Milestone Report.pdf</a> </h3>
 
